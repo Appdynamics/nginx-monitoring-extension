@@ -17,7 +17,7 @@
                         <argument name="location" is-required="true" default-value="nginx_status" />
                 </task-arguments>
                 <java-task>
-                        <classpath>nginx.jar</classpath>
+                        <classpath>NginxMonitor.jar</classpath>
                         <impl-class>com.appdynamics.nginx.NGinXStatusMonitor</impl-class>
                 </java-task>
         </monitor-run-task>
