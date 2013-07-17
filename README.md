@@ -25,12 +25,12 @@ See the <a href="http://wiki.nginx.org/HttpStubStatusModule">nginx wiki</a> for 
 5. In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | WebServer | NGinX | Status.
 
 
-##Files and Folders Included
+##Directory Structure
 
 <table><tbody>
 <tr>
-<th align = 'left'> Directory/File </th>
-<th align = 'left'> Description </th>
+<th align="left"> Directory/File </th>
+<th align="left"> Description </th>
 </tr>
 <tr>
 <td class='confluenceTd'> conf </td>
@@ -69,11 +69,15 @@ See the <a href="http://wiki.nginx.org/HttpStubStatusModule">nginx wiki</a> for 
   
 
 
+
 ##Contributing
 
-Always feel free to fork and contribute any changes directly via GitHub.
+Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/nginx-monitoring-extension).
 
+##Community
+
+Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/Extensions/Nginx-Monitoring-Extension/idi-p/895) community.
 
 ##Support
 
-For any support questions, please contact ace@appdynamics.com.
+For any questions or feature request, please contact [AppDynamics Center of Excellence](mailto://ace-request@appdynamics.com).
