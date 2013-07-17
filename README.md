@@ -18,29 +18,42 @@ Metrics include:
 **Note**: For the following steps to work, nginx should be running with &quot;--with-http_stub_status_module&quot; enabled as well as a stub status on in the nginx.conf. 
 See the <a href="http://wiki.nginx.org/HttpStubStatusModule">nginx wiki</a> for more information</td>.
 
+1. Type 'ant package' in the command line from the nginx-monitoring-extension directory
+2. Deploy the file NginxMonitor.zip found in the 'dist' directory into \<machineagent install dir\>/monitors/
+3. Unzip the deployed file
+4. Restart the machineagent
+5. In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | WebServer | NGinX | Status.
 
-1. In <machine-agent-home>/monitors create a new subdirectory for the nginx monitoring extension.
-2. Copy the contents in the 'dist' folder to the subdirectory created in step 1.
-3. Restart the Machine Agent.  
-4. Look for the metrics in the Metric Browser at: Application Infrastructure Performance|\<Node\>|Custom Metrics|WebServer|NGinX|Status.
-
-#####Rebuilding the Project
-
-1. From the command line, go to root directory (where all the files are located).
-2. Type "ant" (without the quotes).  
-3. 'dist' will be updated with the monitor.xml and nginx.jar.
 
 ##Files and Folders Included
 
-|File/Folder | Description |
-| --- | --- |
-|bin | Contains class files |
-|conf | Contains the monitor.xml |
-|lib | Contains third-party project references |
-|src | Contains source code to NGinX Custom Monitor|
-|dist | Contains the final distribution package (monitor.xml nginx.jar) |
-|build.xml | Ant build script to package the project (only required if changing java code) |
-
+<table><tbody>
+<tr>
+<th align = 'left'> Directory/File </th>
+<th align = 'left'> Description </th>
+</tr>
+<tr>
+<td class='confluenceTd'> conf </td>
+<td class='confluenceTd'> Contains the monitor.xml </td>
+</tr>
+<tr>
+<td class='confluenceTd'> lib </td>
+<td class='confluenceTd'> Contains third-party project references </td>
+</tr>
+<tr>
+<td class='confluenceTd'> src </td>
+<td class='confluenceTd'> Contains source code of the Nginx monitoring extension </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dist </td>
+<td class='confluenceTd'> Only obtained when using ant. Run 'ant build' to get binaries. Run 'ant package' to get the distributable .zip file </td>
+</tr>
+<tr>
+<td class='confluenceTd'> build.xml </td>
+<td class='confluenceTd'> Ant build script to package the project (required only if changing Java code) </td>
+</tr>
+</tbody>
+</table>
 
 ##Metrics
 
