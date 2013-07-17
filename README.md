@@ -1,11 +1,4 @@
-# AppDynamics Nginx Monitoring Extension
-
-* [Use Case](nginx-readme.md#use-case)
-* [Installation](nginx-readme.md#installation)
-* [Rebuilding the Project](nginx-readme.md#Rebuilding-the-project)
-* [Files and Folders](nginx-readme.md#files-and-folders)
-* [Metrics](nginx-readme.md#metrics)
-* [Contributing](nginx-readme.md#contributing)
+# AppDynamics Nginx - Monitoring Extension
 
 ##Use Case
 
@@ -22,7 +15,7 @@ Metrics include:
 
 ##Installation
 
-![Warning](images/emoticons/warning.gif) For the following steps to work, nginx should be running with &quot;--with-http_stub_status_module&quot; enabled as well as a stub status on in the nginx.conf. 
+**Note**: For the following steps to work, nginx should be running with &quot;--with-http_stub_status_module&quot; enabled as well as a stub status on in the nginx.conf. 
 See the <a href="http://wiki.nginx.org/HttpStubStatusModule">nginx wiki</a> for more information</td>.
 
 
@@ -37,9 +30,9 @@ See the <a href="http://wiki.nginx.org/HttpStubStatusModule">nginx wiki</a> for 
 2. Type "ant" (without the quotes).  
 3. 'dist' will be updated with the monitor.xml and nginx.jar.
 
-##Files 
+##Files and Folders Included
 
-|Files/Directory | Description |
+|File/Folder | Description |
 | --- | --- |
 |bin | Contains class files |
 |conf | Contains the monitor.xml |
