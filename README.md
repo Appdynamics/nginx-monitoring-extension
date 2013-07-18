@@ -2,9 +2,7 @@
 
 ##Use Case
 
-Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. (Nginx is pronounced "engine-x".)
-
-The nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser.
+Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser.
 
 Metrics include:
 * Active connections
