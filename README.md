@@ -1,5 +1,7 @@
 # AppDynamics Nginx - Monitoring Extension
 
+This extension works only with the Java agent.
+
 ##Use Case
 
 Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser.
