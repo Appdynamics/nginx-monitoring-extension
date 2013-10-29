@@ -18,7 +18,7 @@
                 </task-arguments>
                 <java-task>
                         <classpath>NginxMonitor.jar</classpath>
-                        <impl-class>com.appdynamics.nginx.NGinXStatusMonitor</impl-class>
-                </java-task>
+                        <impl-class>com.appdynamics.monitors.nginx.NGinXMonitor</impl-class>
+				</java-task>
         </monitor-run-task>
 </monitor>
