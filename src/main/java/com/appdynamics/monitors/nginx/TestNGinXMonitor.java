@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class TestNGinXMonitor {
 
-    @Test
+   // @Test
     public void parseResultsSuccessfully() throws IOException {
         String response = "Active connections: 37 \n" +
                 "server accepts handled requests \n" +
