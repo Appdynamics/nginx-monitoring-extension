@@ -126,41 +126,46 @@ public class NGinXMonitor extends AManagedMonitor
 		HttpExecutionRequest request = new HttpExecutionRequest(getConnectionURL(), "", HttpOperation.GET);
 		HttpExecutionResponse response = httpClient.executeHttpOperation(request, new Log4JLogger(logger));
 
-		Pattern numPattern = Pattern.compile("\\d+");
-		Matcher numMatcher;
 
-		BufferedReader reader = new BufferedReader(new StringReader(response.getResponseBody()));
-		String line, whiteSpaceRegex = "\\s";
-
-		while ((line=reader.readLine()) != null)
-		{
-			if (line.matches("Active connections"))
-			{
-				numMatcher = numPattern.matcher(line);
-				numMatcher.find();
-				resultMap.put("ACTIVE_CONNECTIONS", numMatcher.group());
-			}
-			else if (line.matches("server"))
-			{
-				line = reader.readLine();
-
-				String[] results = line.trim().split(whiteSpaceRegex);
-
-				resultMap.put("SERVER_ACCEPTS", results[0]);
-				resultMap.put("SERVER_HANDLED", results[1]);
-				resultMap.put("SERVER_REQUESTS", results[2]);
-			}
-			else if (line.contains("Reading"))
-			{
-				String[] results = line.trim().split(whiteSpaceRegex);
-				resultMap.put("READING", results[1]);
-				resultMap.put("WRITING", results[3]);
-				resultMap.put("WAITING", results[5]);
-			}
-		}
+	    parseResults(response.getResponseBody());
 	}
 
-	/**
+    public void parseResults(String responseBody) throws IOException {
+        Pattern numPattern = Pattern.compile("\\d+");
+        Matcher numMatcher;
+
+        BufferedReader reader = new BufferedReader(new StringReader(responseBody));
+        String line, whiteSpaceRegex = "\\s";
+
+        while ((line=reader.readLine()) != null)
+        {
+            if (line.contains("Active connections"))
+            {
+                numMatcher = numPattern.matcher(line);
+                numMatcher.find();
+                resultMap.put("ACTIVE_CONNECTIONS", numMatcher.group());
+            }
+            else if (line.contains("server"))
+            {
+                line = reader.readLine();
+
+                String[] results = line.trim().split(whiteSpaceRegex);
+
+                resultMap.put("SERVER_ACCEPTS", results[0]);
+                resultMap.put("SERVER_HANDLED", results[1]);
+                resultMap.put("SERVER_REQUESTS", results[2]);
+            }
+            else if (line.contains("Reading"))
+            {
+                String[] results = line.trim().split(whiteSpaceRegex);
+                resultMap.put("READING", results[1]);
+                resultMap.put("WRITING", results[3]);
+                resultMap.put("WAITING", results[5]);
+            }
+        }
+    }
+
+    /**
 	 * Returns the metric to the AppDynamics Controller.
 	 * @param 	metricName		Name of the Metric
 	 * @param 	metricValue		Value of the Metric
@@ -188,4 +193,13 @@ public class NGinXMonitor extends AManagedMonitor
 	{
 		return metricPrefix;
 	}
+
+    public static void main(String[] args){
+        NGinXMonitor nGinXMonitor = new NGinXMonitor();
+        try {
+            nGinXMonitor.execute(new HashMap<String, String>(),null);
+        } catch (TaskExecutionException e) {
+            e.printStackTrace();
+        }
+    }
 }
