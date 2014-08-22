@@ -1,7 +1,6 @@
 package com.appdynamics.monitors.nginx;
 
 
-import org.junit.Test;
 
 import java.io.IOException;
 
