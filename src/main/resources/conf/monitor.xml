@@ -1,0 +1,28 @@
+<monitor>
+    <name>NGinXMonitor</name>
+    <type>managed</type>
+    <description>NGinX server monitor</description>
+    <monitor-configuration></monitor-configuration>
+    <monitor-run-task>
+        <execution-style>periodic</execution-style>
+        <execution-frequency-in-seconds>60</execution-frequency-in-seconds>
+        <name>NGinX Monitor Run Task</name>
+        <display-name>NGinX Monitor Task</display-name>
+        <description>NGinX Monitor Task</description>
+        <type>java</type>
+        <execution-timeout-in-secs>60</execution-timeout-in-secs>
+        <task-arguments>
+            <argument name="host" is-required="true" default-value="localhost"/>
+            <argument name="port" is-required="true" default-value="8080"/>
+            <argument name="location" is-required="true" default-value="nginx_status"/>
+
+            <!-- Optional Properties  -->
+            <!--<argument name="metric-prefix" is-required="false" default-value="Custom Metrics|WebServer|NGinX"/>-->
+
+        </task-arguments>
+        <java-task>
+            <classpath>nginx-monitoring-extension.jar</classpath>
+            <impl-class>com.appdynamics.monitors.nginx.NGinXMonitor</impl-class>
+        </java-task>
+    </monitor-run-task>
+</monitor>
