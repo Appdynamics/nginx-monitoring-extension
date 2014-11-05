@@ -71,8 +71,6 @@ public class ServerZoneStatsExtractor implements StatsExtractor {
             long sent = serverZone.getLong("sent");
             serverZonesStats.put("server_zones|" + serverZoneName + "|sent", String.valueOf(sent));
         }
-
         return serverZonesStats;
     }
-
 }

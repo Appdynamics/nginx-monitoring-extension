@@ -23,5 +23,4 @@ import java.util.Map;
 
 public interface StatsExtractor {
     Map<String, String> extractStats(JSONObject respJson);
-
 }

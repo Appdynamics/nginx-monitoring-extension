@@ -73,6 +73,4 @@ public class CachesStatsExtractor implements StatsExtractor {
         }
         return cachesStats;
     }
-
-
 }

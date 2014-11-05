@@ -85,13 +85,12 @@ public class NGinXMonitor extends AManagedMonitor {
             Map<String, String> resultMap = populate(argsMap);
 
             String metricPrefix = argsMap.get("metric-prefix");
-
             printAllMetrics(metricPrefix, resultMap);
 
             logger.info("NGinX Metric Upload Complete");
             return new TaskOutput("NGinX Metric Upload Complete");
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error: " + e);
             return new TaskOutput("Error: " + e);
         }
     }
@@ -125,7 +124,6 @@ public class NGinXMonitor extends AManagedMonitor {
         Map<String, String> resultMap = new HashMap<String, String>();
         JSONObject jsonObject = new JSONObject(responseBody);
 
-
         StatsExtractor connectionsStatsExtractor = new ConnectionsStatsExtractor();
         Map<String, String> connectionStats = connectionsStatsExtractor.extractStats(jsonObject);
         resultMap.putAll(connectionStats);
@@ -145,7 +143,6 @@ public class NGinXMonitor extends AManagedMonitor {
         StatsExtractor cachesStatsExtractor = new CachesStatsExtractor();
         Map<String, String> cachesStats = cachesStatsExtractor.extractStats(jsonObject);
         resultMap.putAll(cachesStats);
-
         return resultMap;
     }
 
@@ -191,7 +188,6 @@ public class NGinXMonitor extends AManagedMonitor {
         for (Map.Entry<String, String> metricEntry : resultMap.entrySet()) {
             printMetric(metricPrefix, metricEntry.getKey(), metricEntry.getValue());
         }
-
     }
 
     /**
@@ -207,18 +203,6 @@ public class NGinXMonitor extends AManagedMonitor {
                 MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
                 MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE
         );
-
         metricWriter.printMetric(String.valueOf(metricValue));
-    }
-
-    public static void main(String[] args) {
-        NGinXMonitor nGinXMonitor = new NGinXMonitor();
-        try {
-            nGinXMonitor.execute(new HashMap<String, String>(), null);
-        } catch (TaskExecutionException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }
