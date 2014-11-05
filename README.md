@@ -84,6 +84,7 @@ Metrics include:
 | sent | The total number of bytes sent to clients |
 
 ####Upstreams
+
 | Metric Name | Description |
 | --- | --- |
 | active | The current number of active connections |
@@ -105,7 +106,28 @@ Metrics include:
 | health_checks/unhealthy | How many times the server became unhealthy (state “unhealthy”)  |
 | health_checks/last_passed | Boolean indicating if the last health check request was successful and passed tests  |
 
+####Connections
 
+| Metric Name | Description |
+| --- | --- |
+| accepted | The total number of accepted client connections |
+| dropped | The total number of dropped client connections |
+| active | The current number of active client connections  |
+| idle | The current number of idle client connections |
+
+####Caches
+
+| Metric Name | Description |
+| --- | --- |
+| size | The current size of the cache |
+| max_size | The limit on the maximum size of the cache specified in the configuration |
+| cold | A boolean value indicating whether the “cache loader” process is still loading data from disk into the cache |
+| hit, stale, updating, revalidated/responses | The total number of responses read from the cache |
+| hit, stale, updating, revalidated/bytes | The total number of bytes read from the cache |
+| miss, expired, bypass/responses | The total number of responses not taken from the cache |
+| miss, expired, bypass//bytes | The total number of bytes read from the proxied server |
+| miss, expired, bypass//responses_written | The total number of responses written to the cache |
+| miss, expired, bypass//bytes_written | The total number of bytes written to the cache |
 
 
 ##Contributing
