@@ -125,9 +125,9 @@ Metrics include:
 | hit, stale, updating, revalidated/responses | The total number of responses read from the cache |
 | hit, stale, updating, revalidated/bytes | The total number of bytes read from the cache |
 | miss, expired, bypass/responses | The total number of responses not taken from the cache |
-| miss, expired, bypass//bytes | The total number of bytes read from the proxied server |
-| miss, expired, bypass//responses_written | The total number of responses written to the cache |
-| miss, expired, bypass//bytes_written | The total number of bytes written to the cache |
+| miss, expired, bypass/bytes | The total number of bytes read from the proxied server |
+| miss, expired, bypass/responses_written | The total number of responses written to the cache |
+| miss, expired, bypass/bytes_written | The total number of bytes written to the cache |
 
 
 ##Contributing
