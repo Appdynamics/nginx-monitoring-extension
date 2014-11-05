@@ -129,6 +129,9 @@ Metrics include:
 | miss, expired, bypass/responses_written | The total number of responses written to the cache |
 | miss, expired, bypass/bytes_written | The total number of bytes written to the cache |
 
+## Custom Dashboard
+
+![](https://raw.github.com/Appdynamics/nginx-monitoring-extension/master/nginx_custom.png)
 
 ##Contributing
 
