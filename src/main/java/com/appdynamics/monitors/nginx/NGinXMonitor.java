@@ -202,7 +202,6 @@ public class NGinXMonitor extends AManagedMonitor {
      * @param metricValue  Value of the Metric
      */
     private void printMetric(String metricPrefix, String metricName, Object metricValue) {
-        System.out.println(metricPrefix + METRIC_SEPARATOR + metricName+":::"+metricValue);
         MetricWriter metricWriter = getMetricWriter(metricPrefix + METRIC_SEPARATOR + metricName,
                 MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
                 MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
