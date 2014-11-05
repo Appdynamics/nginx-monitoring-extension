@@ -4,7 +4,7 @@ This extension works only with the Java agent.
 
 ##Use Case
 
-Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser.
+Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser. This extension supports both NGinx and NGinx Plus.
 
 Metrics include:
 * Active connections
@@ -52,6 +52,8 @@ Metrics include:
 
 ##Metrics
 
+###NGinx Metrics
+
 | Metric Name | Description |
 | --- | --- |
 | Active Connections | Number of all open active connections |
@@ -62,6 +64,47 @@ Metrics include:
 | Writing | Nginx reads request body, processes request, or writes response to a client  |
 | Waiting | NGinX keep-alive connections or currently active |
   
+###NGinx Plus Metrics
+
+####Requests
+
+| Metric Name | Description |
+| --- | --- |
+| total | The total number of client requests |
+| current | The current number of client requests |
+
+####Server Zones
+| Metric Name | Description |
+| --- | --- |
+| processing | The number of client requests that are currently being processed |
+| requests | The total number of client requests received from clients |
+| responses/total | The total number of responses sent to clients |
+| responses/ 1xx, 2xx, 3xx, 4xx, 5xx  | The number of responses with status codes 1xx, 2xx, 3xx, 4xx, and 5xx |
+| received | The total number of bytes received from clients  |
+| sent | The total number of bytes sent to clients |
+
+####Upstreams
+| Metric Name | Description |
+| --- | --- |
+| active | The current number of active connections |
+| backup | A boolean value indicating whether the server is a backup server |
+| downstart | The time (in milliseconds since Epoch) when the server became “unavail” or “unhealthy”  |
+| downtime  | Total time the server was in the “unavail” and “unhealthy” states |
+| fails | The total number of unsuccessful attempts to communicate with the server |
+| keepalive | The current number of idle keepalive connections |
+| received | The total number of bytes received from this server |
+| requests | The total number of client requests forwarded to this server |
+| sent | The total number of bytes sent to this server |
+| state | urrent state, which may be one of “up”, “down”, “unavail”, or “unhealthy”.  |
+| unavail | Times the server became unavailable |
+| weight | Weight of the server |
+| responses/total | The total number of responses obtained from this server |
+| responses/ 1xx, 2xx, 3xx, 4xx, 5xx  | The number of responses with status codes 1xx, 2xx, 3xx, 4xx, and 5xx |
+| health_checks/checks | The total number of health check requests made |
+| health_checks/fails | The number of failed health checks  |
+| health_checks/unhealthy | How many times the server became unhealthy (state “unhealthy”)  |
+| health_checks/last_passed | Boolean indicating if the last health check request was successful and passed tests  |
+
 
 
 
