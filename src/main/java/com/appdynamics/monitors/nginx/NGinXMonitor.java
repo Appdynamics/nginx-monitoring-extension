@@ -103,21 +103,25 @@ public class NGinXMonitor extends AManagedMonitor {
     private Map<String, String> populate(Map<String, String> argsMap) throws IOException, TaskExecutionException {
 
         SimpleHttpClient httpClient = SimpleHttpClient.builder(argsMap).build();
-        String url = UrlBuilder.builder(argsMap).path(argsMap.get("location")).build();
-        Response response = httpClient.target(url).get();
-        String responseBody = response.string();
-        String header = response.getHeader("Content-Type");
+        try {
+            String url = UrlBuilder.builder(argsMap).path(argsMap.get("location")).build();
+            Response response = httpClient.target(url).get();
+            String responseBody = response.string();
+            String header = response.getHeader("Content-Type");
 
-        Map<String, String> resultMap = null;
-        if ("application/json".equals(header)) {
-            resultMap = parsePlusStatsResult(responseBody);
-        } else if ("text/plain".equals(header)) {
-            resultMap = parseStubStatsResults(responseBody);
-        } else {
-            logger.error("Invalid content type for URL " + url);
-            throw new TaskExecutionException("Invalid content type for URL " + url);
+            Map<String, String> resultMap = null;
+            if ("application/json".equals(header)) {
+                resultMap = parsePlusStatsResult(responseBody);
+            } else if ("text/plain".equals(header)) {
+                resultMap = parseStubStatsResults(responseBody);
+            } else {
+                logger.error("Invalid content type for URL " + url);
+                throw new TaskExecutionException("Invalid content type for URL " + url);
+            }
+            return resultMap;
+        } finally {
+            httpClient.close();
         }
-        return resultMap;
     }
 
     private Map<String, String> parsePlusStatsResult(String responseBody) {
