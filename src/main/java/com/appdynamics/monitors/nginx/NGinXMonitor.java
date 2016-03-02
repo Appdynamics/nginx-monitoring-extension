@@ -1,12 +1,12 @@
 /**
  * Copyright 2014 AppDynamics, Inc.
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -202,11 +202,23 @@ public class NGinXMonitor extends AManagedMonitor {
      * @param metricValue  Value of the Metric
      */
     private void printMetric(String metricPrefix, String metricName, Object metricValue) {
-        MetricWriter metricWriter = getMetricWriter(metricPrefix + METRIC_SEPARATOR + metricName,
-                MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION,
-                MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE,
-                MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE
+
+        String aggregation = MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION;
+        String timeRollup = MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE;
+        String cluster = MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE;
+
+        String metricPath = metricPrefix + METRIC_SEPARATOR + metricName;
+
+        MetricWriter metricWriter = getMetricWriter(metricPath,
+                aggregation,
+                timeRollup,
+                cluster
         );
         metricWriter.printMetric(String.valueOf(metricValue));
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Metric [" + aggregation + "/" + timeRollup + "/" + cluster
+                    + "] metric = " + metricPath + " = " + metricValue);
+        }
     }
 }
