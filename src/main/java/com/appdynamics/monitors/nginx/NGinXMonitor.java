@@ -110,13 +110,13 @@ public class NGinXMonitor extends AManagedMonitor {
             String header = response.getHeader("Content-Type");
 
             Map<String, String> resultMap = null;
-            if ("application/json".equals(header)) {
+            if (header != null && header.contains("application/json")) {
                 resultMap = parsePlusStatsResult(responseBody);
-            } else if ("text/plain".equals(header)) {
+            } else if (header != null && header.contains("text/plain")) {
                 resultMap = parseStubStatsResults(responseBody);
             } else {
-                logger.error("Invalid content type for URL " + url);
-                throw new TaskExecutionException("Invalid content type for URL " + url);
+                logger.error("Invalid content type [ " + header + " ] for URL " + url);
+                throw new TaskExecutionException("Invalid content type [ " + header + " ] for URL " + url);
             }
             return resultMap;
         } finally {
