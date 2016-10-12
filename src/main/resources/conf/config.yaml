@@ -1,0 +1,17 @@
+#prefix used to show up metrics in AppDynamics
+metricPrefix:  "Custom Metrics|WebServer|NGinX"
+
+#This will create it in specific Tier. Replace <TIER_ID>
+#metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|NginX Monitor|"
+
+servers:
+  - uri: "http://demo.nginx.com/status"
+    name: "NGinX Monitor" #Optional if only one server
+    username: "user"
+    password: "password"
+#    filter:
+#      pools:
+#        includes: [.*]
+
+
+numberOfThreads: 5

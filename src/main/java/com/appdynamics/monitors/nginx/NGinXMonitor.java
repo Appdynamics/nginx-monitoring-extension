@@ -1,224 +1,82 @@
-/**
- * Copyright 2014 AppDynamics, Inc.
- * <p/>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p/>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p/>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.appdynamics.monitors.nginx;
 
-import com.appdynamics.extensions.ArgumentsValidator;
-import com.appdynamics.extensions.http.Response;
-import com.appdynamics.extensions.http.SimpleHttpClient;
-import com.appdynamics.extensions.http.UrlBuilder;
-import com.appdynamics.monitors.nginx.statsExtractor.CachesStatsExtractor;
-import com.appdynamics.monitors.nginx.statsExtractor.ConnectionsStatsExtractor;
-import com.appdynamics.monitors.nginx.statsExtractor.RequestsStatsExtractor;
-import com.appdynamics.monitors.nginx.statsExtractor.ServerZoneStatsExtractor;
-import com.appdynamics.monitors.nginx.statsExtractor.StatsExtractor;
-import com.appdynamics.monitors.nginx.statsExtractor.UpstreamsStatsExtractor;
+import com.appdynamics.extensions.conf.MonitorConfiguration;
+import com.appdynamics.extensions.util.MetricWriteHelper;
+import com.appdynamics.extensions.util.MetricWriteHelperFactory;
+import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
-import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-import org.apache.log4j.Logger;
-import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 /**
- * NGinXStatusMonitor is a class that provides metrics on NGinX server by using the
- * NGinX status stub.
+ * Created by adityajagtiani on 8/31/16.
  */
 public class NGinXMonitor extends AManagedMonitor {
-    /**
-     * The metric can be found in Application Infrastructure Performance|{@literal <}Node{@literal >}|Custom Metrics|WebServer|NGinX|Status
-     */
-    private static final Logger logger = Logger.getLogger(NGinXMonitor.class);
-
-    private static final String METRIC_SEPARATOR = "|";
-
-    private static final Map<String, String> DEFAULT_ARGS = new HashMap<String, String>() {{
-        put("host", "localhost");
-        put("port", "8080");
-        put("location", "nginx_status");
-        put("metric-prefix", "Custom Metrics|WebServer|NGinX");
-    }};
+    public static final Logger logger = LoggerFactory.getLogger(NGinXMonitor.class);
+    private MonitorConfiguration configuration;
 
     public NGinXMonitor() {
-        String version = getClass().getPackage().getImplementationTitle();
-        String msg = String.format("Using Monitor Version [%s]", version);
-        logger.info(msg);
-        System.out.println(msg);
+        logger.info(String.format("Using NGinXMonitor Version [%s]", getImplementationVersion()));
     }
 
-    /**
-     * Main execution method that uploads the metrics to the AppDynamics Controller
-     *
-     * @see com.singularity.ee.agent.systemagent.api.ITask#execute(java.util.Map, com.singularity.ee.agent.systemagent.api.TaskExecutionContext)
-     */
-    public TaskOutput execute(Map<String, String> argsMap, TaskExecutionContext executionContext)
-            throws TaskExecutionException {
-        try {
+    private static String getImplementationVersion() {
+        return NGinXMonitor.class.getPackage().getImplementationTitle();
+    }
 
-            logger.debug("The args map before filling the default is:  " + argsMap);
-            argsMap = ArgumentsValidator.validateArguments(argsMap, DEFAULT_ARGS);
-            logger.debug("The args map after filling the default is: " + argsMap);
-
-            Map<String, String> resultMap = populate(argsMap);
-
-            String metricPrefix = argsMap.get("metric-prefix");
-            printAllMetrics(metricPrefix, resultMap);
-
-            logger.info("NGinX Metric Upload Complete");
-            return new TaskOutput("NGinX Metric Upload Complete");
-        } catch (Exception e) {
-            logger.error("Error: " + e);
-            return new TaskOutput("Error: " + e);
+    protected void initialize(Map<String, String> argsMap) {
+        if (configuration == null) {
+            MetricWriteHelper metricWriter = MetricWriteHelperFactory.create(this);
+            MonitorConfiguration conf = new MonitorConfiguration("Custom Metrics|WebServer|NGinX", new TaskRunner(),metricWriter);
+            final String configFilePath = argsMap.get("config-file");
+            conf.setConfigYml(configFilePath);
+            conf.checkIfInitialized(MonitorConfiguration.ConfItem.METRIC_PREFIX, MonitorConfiguration.ConfItem.CONFIG_YML, MonitorConfiguration.ConfItem.HTTP_CLIENT
+                    , MonitorConfiguration.ConfItem.EXECUTOR_SERVICE);
+            this.configuration = conf;
         }
     }
 
-    /**
-     * Fetches Statistics from NGinX Server
-     *
-     * @param argsMap arguments passed
-     */
-    private Map<String, String> populate(Map<String, String> argsMap) throws IOException, TaskExecutionException {
+    private class TaskRunner implements Runnable{
 
-        SimpleHttpClient httpClient = SimpleHttpClient.builder(argsMap).build();
-        try {
-            String url = UrlBuilder.builder(argsMap).path(argsMap.get("location")).build();
-            Response response = httpClient.target(url).get();
-            String responseBody = response.string();
-            String header = response.getHeader("Content-Type");
-
-            Map<String, String> resultMap = null;
-            if (header != null && header.contains("application/json")) {
-                resultMap = parsePlusStatsResult(responseBody);
-            } else if (header != null && header.contains("text/plain")) {
-                resultMap = parseStubStatsResults(responseBody);
+        @Override
+        public void run () {
+            Map<String, ?> config = configuration.getConfigYml();
+            List<Map> servers = (List) config.get("servers");
+            if (servers != null && !servers.isEmpty()) {
+                for (Map server : servers) {
+                    //HttpClient client = new Client();
+                    NGinXMonitorTask task = new NGinXMonitorTask(configuration, server/*,client*/);
+                    configuration.getExecutorService().execute(task);
+                }
             } else {
-                logger.error("Invalid content type [ " + header + " ] for URL " + url);
-                throw new TaskExecutionException("Invalid content type [ " + header + " ] for URL " + url);
-            }
-            return resultMap;
-        } finally {
-            httpClient.close();
-        }
-    }
-
-    private Map<String, String> parsePlusStatsResult(String responseBody) {
-        Map<String, String> resultMap = new HashMap<String, String>();
-        JSONObject jsonObject = new JSONObject(responseBody);
-
-        StatsExtractor connectionsStatsExtractor = new ConnectionsStatsExtractor();
-        Map<String, String> connectionStats = connectionsStatsExtractor.extractStats(jsonObject);
-        resultMap.putAll(connectionStats);
-
-        StatsExtractor requestsStatsExtractor = new RequestsStatsExtractor();
-        Map<String, String> requestStats = requestsStatsExtractor.extractStats(jsonObject);
-        resultMap.putAll(requestStats);
-
-        StatsExtractor serverZoneStatsExtractor = new ServerZoneStatsExtractor();
-        Map<String, String> serverZonesStats = serverZoneStatsExtractor.extractStats(jsonObject);
-        resultMap.putAll(serverZonesStats);
-
-        StatsExtractor upstreamsStatsExtractor = new UpstreamsStatsExtractor();
-        Map<String, String> upstreamsStats = upstreamsStatsExtractor.extractStats(jsonObject);
-        resultMap.putAll(upstreamsStats);
-
-        StatsExtractor cachesStatsExtractor = new CachesStatsExtractor();
-        Map<String, String> cachesStats = cachesStatsExtractor.extractStats(jsonObject);
-        resultMap.putAll(cachesStats);
-        return resultMap;
-    }
-
-
-    private Map<String, String> parseStubStatsResults(String responseBody) throws IOException {
-
-        Map<String, String> resultMap = new HashMap<String, String>();
-
-        Pattern numPattern = Pattern.compile("\\d+");
-        Matcher numMatcher;
-
-        BufferedReader reader = new BufferedReader(new StringReader(responseBody));
-        String line, whiteSpaceRegex = "\\s";
-
-        while ((line = reader.readLine()) != null) {
-            if (line.contains("Active connections")) {
-                numMatcher = numPattern.matcher(line);
-                numMatcher.find();
-                resultMap.put("Active Connections", numMatcher.group());
-            } else if (line.contains("server")) {
-                line = reader.readLine();
-
-                String[] results = line.trim().split(whiteSpaceRegex);
-
-                resultMap.put("Server|Accepts", results[0]);
-                resultMap.put("Server|Handled", results[1]);
-                resultMap.put("Server|Requests", results[2]);
-            } else if (line.contains("Reading")) {
-                String[] results = line.trim().split(whiteSpaceRegex);
-                resultMap.put("Reading", results[1]);
-                resultMap.put("Writing", results[3]);
-                resultMap.put("Waiting", results[5]);
+                logger.error("The stats read from the metric xml is empty. Please make sure that the metrics xml is correct");
             }
         }
-        return resultMap;
     }
 
-    /**
-     * @param metricPrefix
-     * @param resultMap
-     */
-    private void printAllMetrics(String metricPrefix, Map<String, String> resultMap) {
-        for (Map.Entry<String, String> metricEntry : resultMap.entrySet()) {
-            printMetric(metricPrefix, metricEntry.getKey(), metricEntry.getValue());
+    public TaskOutput execute(Map<String, String> map, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
+        logger.debug("The raw arguments are {}", map);
+        try {
+            initialize(map);
+            configuration.executeTask();
         }
+        catch(Exception e){
+            if(configuration != null && configuration.getMetricWriter() != null) {
+                configuration.getMetricWriter().registerError(e.getMessage(), e);
+            }
+        }
+        return null;
     }
 
-    /**
-     * Returns the metric to the AppDynamics Controller.
-     *
-     * @param metricPrefix Metric prefix
-     * @param metricName   Name of the Metric
-     * @param metricValue  Value of the Metric
-     */
-    private void printMetric(String metricPrefix, String metricName, Object metricValue) {
-
-        String aggregation = MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION;
-        String timeRollup = MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE;
-        String cluster = MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE;
-
-        String metricPath = metricPrefix + METRIC_SEPARATOR + metricName;
-
-        MetricWriter metricWriter = getMetricWriter(metricPath,
-                aggregation,
-                timeRollup,
-                cluster
-        );
-        metricWriter.printMetric(String.valueOf(metricValue));
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("Metric [" + aggregation + "/" + timeRollup + "/" + cluster
-                    + "] metric = " + metricPath + " = " + metricValue);
-        }
+    public static void main (String[] arg) throws TaskExecutionException {
+        NGinXMonitor monitor = new NGinXMonitor();
+        Map<String,String> args = Maps.newHashMap();
+        args.put("config-file","/Users/adityajagtiani/repos/appdynamics/extensions/nginx-monitoring-extension/src/main/resources/conf/config.yaml");
+        monitor.execute(args,null);
     }
 }
