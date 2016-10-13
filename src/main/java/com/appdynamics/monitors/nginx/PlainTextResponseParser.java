@@ -32,9 +32,7 @@ public class PlainTextResponseParser {
                 }
             } else if (line.contains("server")) {
                 line = reader.readLine();
-
                 String[] results = line.trim().split(whiteSpaceRegex);
-
                 resultMap.put("Server|Accepts", results[0]);
                 resultMap.put("Server|Handled", results[1]);
                 resultMap.put("Server|Requests", results[2]);
