@@ -12,10 +12,7 @@
         <type>java</type>
         <execution-timeout-in-secs>60</execution-timeout-in-secs>
         <task-arguments>
-            <argument name="host" is-required="true" default-value="demo.nginx.com"/>
-            <argument name="port" is-required="true" default-value="80"/>
-            <argument name="location" is-required="true" default-value="status"/>
-
+            <argument name="config-file" is-required="true" default-value="monitors/NGinXMonitor/config.yaml" />
             <!-- Optional Properties  -->
             <!--<argument name="metric-prefix" is-required="false" default-value="Custom Metrics|WebServer|NGinX"/>-->
 
