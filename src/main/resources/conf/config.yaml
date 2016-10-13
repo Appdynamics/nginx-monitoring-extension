@@ -9,7 +9,7 @@ servers:
     name: "NGinX Monitor" #Optional if only one server
     username: "user"
     password: "password"
-#    filter:
+#   filter:
 #      pools:
 #        includes: [.*]
 
