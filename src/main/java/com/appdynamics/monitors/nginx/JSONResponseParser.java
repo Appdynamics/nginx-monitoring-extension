@@ -10,12 +10,12 @@ import java.util.Map;
  * Created by adityajagtiani on 10/10/16.
  */
 public class JSONResponseParser {
-    private Map<String, String> resultMap;
+
     public JSONResponseParser() {
-        resultMap = new HashMap<String, String>();
     }
 
     public Map<String, String> parseResponse (String responseBody) {
+        Map<String, String> resultMap = new HashMap<String, String>();
         JSONObject jsonObject = new JSONObject(responseBody);
 
         StatsExtractor connectionsStatsExtractor = new ConnectionsStatsExtractor();

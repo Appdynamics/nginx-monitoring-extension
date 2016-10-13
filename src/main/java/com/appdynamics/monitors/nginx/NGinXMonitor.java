@@ -3,7 +3,6 @@ package com.appdynamics.monitors.nginx;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.util.MetricWriteHelper;
 import com.appdynamics.extensions.util.MetricWriteHelperFactory;
-import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
@@ -49,8 +48,7 @@ public class NGinXMonitor extends AManagedMonitor {
             List<Map> servers = (List) config.get("servers");
             if (servers != null && !servers.isEmpty()) {
                 for (Map server : servers) {
-                    //HttpClient client = new Client();
-                    NGinXMonitorTask task = new NGinXMonitorTask(configuration, server/*,client*/);
+                    NGinXMonitorTask task = new NGinXMonitorTask(configuration, server);
                     configuration.getExecutorService().execute(task);
                 }
             } else {
@@ -71,12 +69,5 @@ public class NGinXMonitor extends AManagedMonitor {
             }
         }
         return null;
-    }
-
-    public static void main (String[] arg) throws TaskExecutionException {
-        NGinXMonitor monitor = new NGinXMonitor();
-        Map<String,String> args = Maps.newHashMap();
-        args.put("config-file","/Users/adityajagtiani/repos/appdynamics/extensions/nginx-monitoring-extension/src/main/resources/conf/config.yaml");
-        monitor.execute(args,null);
     }
 }

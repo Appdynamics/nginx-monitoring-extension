@@ -12,6 +12,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -49,19 +50,23 @@ public class NGinXMonitorTask implements Runnable {
             CloseableHttpResponse response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity, "UTF-8");
-            String header = response.getFirstHeader("Content-Type").getValue();
-            Map<String, String> resultMap;
-            if (header != null && header.contains("application/json")) {
-                JSONResponseParser jsonParser = new JSONResponseParser();
-                resultMap = jsonParser.parseResponse(responseBody);
-            } else {
-                if (header != null && header.contains("text/plain")) {
-                    PlainTextResponseParser plainTextParser = new PlainTextResponseParser();
-                    resultMap = plainTextParser.parseResponse(responseBody);
+            Map<String, String> resultMap = new HashMap<String, String>();
+            if(responseBody == null) {
+                logger.error("Response body doesn't exist");
+            }
+            else {
+                String header = response.getFirstHeader("Content-Type").getValue();
+                if (header != null && header.contains("application/json")) {
+                    JSONResponseParser jsonParser = new JSONResponseParser();
+                    resultMap = jsonParser.parseResponse(responseBody);
                 } else {
-                    logger.error("Invalid content type [ " + header + " ] for URL " + url);
-                    throw new TaskExecutionException("Invalid content type [ " + header + " ] for URL " +
-                            url);
+                    if (header != null && header.contains("text/plain")) {
+                        PlainTextResponseParser plainTextParser = new PlainTextResponseParser();
+                        resultMap = plainTextParser.parseResponse(responseBody);
+                    } else {
+                        logger.error("Invalid content type [ " + header + " ] for URL " + url);
+                        throw new TaskExecutionException("Invalid content type [ " + header + " ] for URL " + url);
+                    }
                 }
             }
             return resultMap;

@@ -12,13 +12,11 @@ import java.util.regex.Pattern;
  * Created by adityajagtiani on 10/10/16.
  */
 public class PlainTextResponseParser {
-    Map <String, String> resultMap;
 
-    public PlainTextResponseParser() {
-        resultMap = new HashMap<String, String>();
-    }
+    public PlainTextResponseParser() {}
 
     public Map<String, String> parseResponse (String responseBody) throws IOException {
+        Map <String, String> resultMap = new HashMap<String, String>();
         Pattern numPattern = Pattern.compile("\\d+");
         Matcher numMatcher;
         BufferedReader reader = new BufferedReader(new StringReader(responseBody));
