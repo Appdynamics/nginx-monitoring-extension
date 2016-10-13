@@ -1,9 +1,12 @@
 package com.appdynamics.monitors.nginx;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.FileInputStream;
 import java.util.*;
 
 import java.io.IOException;
@@ -15,11 +18,17 @@ public class PlainTextResponseParserTest {
     PlainTextResponseParser parser;
     String responseBody;
     Map<String, String> results;
+    FileInputStream inputStream;
 
     @Before
-    public void initialize() {
+    public void initialize() throws IOException {
         parser = new PlainTextResponseParser();
-        responseBody = "Active connections: 1 \n server accepts handled requests\n 28 28 26 \nReading: 0 Writing: 1 Waiting: 5770848640 \n";
+        inputStream = new FileInputStream("src/test/resources/TestPlainText.txt");
+        try {
+            responseBody = IOUtils.toString(inputStream);
+        } finally {
+            inputStream.close();
+        }
         results = new HashMap<String, String>();
     }
 
