@@ -7,8 +7,6 @@ metricPrefix:  "Custom Metrics|WebServer|NGinX"
 servers:
   - uri: "http://demo.nginx.com/status"
     name: "NGinX Monitor" #Optional if only one server
-    username: "user"
-    password: "password"
 #   filter:
 #      pools:
 #        includes: [.*]
