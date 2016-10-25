@@ -44,10 +44,11 @@ public class NGinXMonitorTask implements Runnable {
 
     private Map<String, String> populate() throws IOException, TaskExecutionException {
         CloseableHttpClient httpClient = configuration.getHttpClient();
+        CloseableHttpResponse response = null;
         try {
             String url = UrlBuilder.fromYmlServerConfig(server).build();
             HttpGet get = new HttpGet(url);
-            CloseableHttpResponse response = httpClient.execute(get);
+            response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity, "UTF-8");
             Map<String, String> resultMap = new HashMap<String, String>();
@@ -70,8 +71,11 @@ public class NGinXMonitorTask implements Runnable {
                 }
             }
             return resultMap;
-        } finally {
-            httpClient.close();
+        }
+        finally {
+            if(response != null) {
+                response.close();
+            }
         }
     }
 

@@ -11,5 +11,7 @@ servers:
 #      pools:
 #        includes: [.*]
 
+connection:
+  sslCertCheckEnabled: false
 
 numberOfThreads: 5
