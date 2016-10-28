@@ -101,7 +101,8 @@ public class NGinXMonitorTask implements Runnable {
         String aggregation = MetricWriter.METRIC_AGGREGATION_TYPE_OBSERVATION;
         String timeRollup = MetricWriter.METRIC_TIME_ROLLUP_TYPE_AVERAGE;
         String cluster = MetricWriter.METRIC_CLUSTER_ROLLUP_TYPE_COLLECTIVE;
-        String metricPath = metricPrefix + METRIC_SEPARATOR + metricName;
+        String serverName = (String) server.get("name");
+        String metricPath = metricPrefix + METRIC_SEPARATOR + serverName + METRIC_SEPARATOR + metricName;
         MetricWriteHelper metricWriter = configuration.getMetricWriter();
         metricWriter.printMetric(metricPath, metricValue.toString(), aggregation, timeRollup, cluster);
 
