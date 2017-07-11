@@ -66,7 +66,7 @@ public class NGinXMonitorTask implements Runnable {
                         resultMap = plainTextParser.parseResponse(responseBody);
                     } else {
                         logger.error("Invalid content type [ " + header + " ] for URL " + url);
-                        throw new TaskExecutionException("Invalid content type [ " + header + " ] for URL " + url);
+                        throw new TaskExecutionException();
                     }
                 }
             }

@@ -3,16 +3,12 @@ package com.appdynamics.monitors.nginx;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.util.MetricWriteHelper;
 import com.appdynamics.extensions.util.MetricWriteHelperFactory;
-import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
 import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
 import com.singularity.ee.agent.systemagent.api.TaskOutput;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-import com.singularity.ee.controller.api.dto.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
