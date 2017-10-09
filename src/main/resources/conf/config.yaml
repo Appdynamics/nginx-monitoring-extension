@@ -6,7 +6,7 @@ metricPrefix:  "Custom Metrics|WebServer|NGinX"
 
 servers:
   - uri: "http://demo.nginx.com/status"
-    name: "NGinX Monitor1" #Optional if only one server
+    name: "NGinX Monitor1" # mandatory
 #   filter:
 #      pools:
 #        includes: [.*]
