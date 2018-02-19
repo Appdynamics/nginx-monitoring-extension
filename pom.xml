@@ -4,7 +4,7 @@
 
     <groupId>com.appdynamics.extensions</groupId>
     <artifactId>nginx-monitoring-extension</artifactId>
-    <version>1.1.8</version>
+    <version>1.1.9</version>
     <packaging>jar</packaging>
 
     <name>nginx-monitoring-extension</name>
@@ -163,6 +163,12 @@
                                 <copy todir="${target.dir}">
                                     <fileset dir="${project.build.directory}"
                                              includes="${project.artifactId}.${project.packaging}"/>
+                                </copy>
+                                <copy todir="${target.dir}">
+                                    <fileset dir="${project.basedir}" includes="LICENSE"/>
+                                </copy>
+                                <copy todir="${target.dir}">
+                                    <fileset dir="${project.basedir}" includes="NOTICE.txt"/>
                                 </copy>
                                 <zip destfile="${target.dir}-${project.version}.zip">
                                     <zipfileset dir="${target.dir}" filemode="755" prefix="NGinXMonitor"/>
