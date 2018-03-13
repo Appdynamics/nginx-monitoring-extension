@@ -2,7 +2,7 @@
 
 This extension works only with the java standalone machine agent.
 
-##Use Case
+## Use Case
 
 Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser. This extension supports both NGinx and NGinx Plus.
 
@@ -13,7 +13,7 @@ Metrics include:
 * Reading, writing, and waiting
 
 
-##Installation
+## Installation
 
 **Note**: For the following steps to work, nginx should be running with <a href="http://nginx.org/en/docs/http/ngx_http_stub_status_module.html">&quot;ngx_http_stub_status_module&quot;</a> or <a href="http://nginx.org/en/docs/http/ngx_http_status_module.html">&quot;ngx_http_status_module&quot;</a> enabled. Please make sure you have required changes in the nginx.conf.
 
@@ -24,7 +24,7 @@ Metrics include:
 5. In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | WebServer | NGinX.
 
 
-##Directory Structure
+## Directory Structure
 
 <table><tbody>
 <tr>
@@ -50,9 +50,9 @@ Metrics include:
 </tbody>
 </table>
 
-##Metrics
+## Metrics
 
-###NGinx Metrics
+### NGinx Metrics
 
 | Metric Name | Description |
 | --- | --- |
@@ -64,16 +64,16 @@ Metrics include:
 | Writing | Nginx reads request body, processes request, or writes response to a client  |
 | Waiting | NGinX keep-alive connections or currently active |
   
-###NGinx Plus Metrics
+### NGinx Plus Metrics
 
-####Requests
+#### Requests
 
 | Metric Name | Description |
 | --- | --- |
 | total | The total number of client requests |
 | current | The current number of client requests |
 
-####Server Zones
+#### Server Zones
 | Metric Name | Description |
 | --- | --- |
 | processing | The number of client requests that are currently being processed |
@@ -83,7 +83,7 @@ Metrics include:
 | received | The total number of bytes received from clients  |
 | sent | The total number of bytes sent to clients |
 
-####Upstreams
+#### Upstreams
 
 | Metric Name | Description |
 | --- | --- |
@@ -106,7 +106,7 @@ Metrics include:
 | health_checks/unhealthy | How many times the server became unhealthy (state “unhealthy”)  |
 | health_checks/last_passed | Boolean indicating if the last health check request was successful and passed tests  |
 
-####Connections
+#### Connections
 
 | Metric Name | Description |
 | --- | --- |
@@ -115,7 +115,7 @@ Metrics include:
 | active | The current number of active client connections  |
 | idle | The current number of idle client connections |
 
-####Caches
+#### Caches
 
 | Metric Name | Description |
 | --- | --- |
@@ -133,14 +133,41 @@ Metrics include:
 
 ![](https://raw.github.com/Appdynamics/nginx-monitoring-extension/master/nginx_custom.png)
 
-##Contributing
+    
+## Contributing
+Always feel free to fork and contribute any changes directly here on [GitHub].
 
-Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/nginx-monitoring-extension).
+## Community
+Find out more in the [AppDynamics Exchange] community.
 
-##Community
+## Troubleshooting ##
 
-Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/Extensions/Nginx-Monitoring-Extension/idi-p/895) community.
+Please follow the steps listed in this [troubleshooting-document] in order to troubleshoot your issue. 
+These are a set of common issues that customers might have faced during the installation of the extension. 
+If these don't solve your issue, please follow the last step on the [troubleshooting-document] to contact the support team.
 
-##Support
+## Credentials Encryption ##
 
-For any questions or feature request, please contact [AppDynamics Center of Excellence](mailto:help@appdynamics.com).
+Please visit [Encryption Guidelines] to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
+If you want to use password encryption, please send arguments as connectionProperties. You will have to fill in the encrypted Password and Encryption Key fields in the config but you will also have to give an empty "" value to the password field and the encrypted password will be automatically picked up.
+
+## Extensions Workbench ##
+Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually
+ deploy it on the controller. Please review the following document on [How to use the Extensions WorkBench ]
+
+## Version 
+|Product | Version | 
+| ----- | ----- | 
+| Extension Version|  1.2.0 | 
+| Controller Compatability | 3.7+ |
+| Last Updated | March 13, 2018 | 
+
+**List of Changes can be found in the [Changelog.md]**
+
+
+[How to use the Extensions WorkBench ]: https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130
+[Changelog.md]: https://github.com/Appdynamics/jmx-monitoring-extension/blob/1.0.0/Changelog.md
+[Encryption Guidelines]: https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397
+[troubleshooting-document]: https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695
+[AppDynamics Exchange]: https://www.appdynamics.com/community/exchange/extension/nginx-and-nginx-plus-monitoring-extension/
+[GitHub]: https://github.com/Appdynamics/nginx-monitoring-extension/
