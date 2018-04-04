@@ -2,7 +2,7 @@
 
 This extension works only with the java standalone machine agent.
 
-##Use Case
+## Use Case
 
 Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser. This extension supports both NGinx and NGinx Plus.
 
@@ -13,7 +13,7 @@ Metrics include:
 * Reading, writing, and waiting
 
 
-##Installation
+## Installation
 
 **Note**: For the following steps to work, nginx should be running with <a href="http://nginx.org/en/docs/http/ngx_http_stub_status_module.html">&quot;ngx_http_stub_status_module&quot;</a> or <a href="http://nginx.org/en/docs/http/ngx_http_status_module.html">&quot;ngx_http_status_module&quot;</a> enabled. Please make sure you have required changes in the nginx.conf.
 
@@ -24,7 +24,7 @@ Metrics include:
 5. In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | WebServer | NGinX.
 
 
-##Directory Structure
+## Directory Structure
 
 <table><tbody>
 <tr>
@@ -50,9 +50,9 @@ Metrics include:
 </tbody>
 </table>
 
-##Metrics
+## Metrics
 
-###NGinx Metrics
+### NGinx Metrics
 
 | Metric Name | Description |
 | --- | --- |
@@ -64,16 +64,16 @@ Metrics include:
 | Writing | Nginx reads request body, processes request, or writes response to a client  |
 | Waiting | NGinX keep-alive connections or currently active |
   
-###NGinx Plus Metrics
+### NGinx Plus Metrics
 
-####Requests
+#### Requests
 
 | Metric Name | Description |
 | --- | --- |
 | total | The total number of client requests |
 | current | The current number of client requests |
 
-####Server Zones
+#### Server Zones
 | Metric Name | Description |
 | --- | --- |
 | processing | The number of client requests that are currently being processed |
@@ -83,7 +83,7 @@ Metrics include:
 | received | The total number of bytes received from clients  |
 | sent | The total number of bytes sent to clients |
 
-####Upstreams
+#### Upstreams
 
 | Metric Name | Description |
 | --- | --- |
@@ -106,7 +106,7 @@ Metrics include:
 | health_checks/unhealthy | How many times the server became unhealthy (state “unhealthy”)  |
 | health_checks/last_passed | Boolean indicating if the last health check request was successful and passed tests  |
 
-####Connections
+#### Connections
 
 | Metric Name | Description |
 | --- | --- |
@@ -115,7 +115,7 @@ Metrics include:
 | active | The current number of active client connections  |
 | idle | The current number of idle client connections |
 
-####Caches
+#### Caches
 
 | Metric Name | Description |
 | --- | --- |
@@ -133,14 +133,14 @@ Metrics include:
 
 ![](https://raw.github.com/Appdynamics/nginx-monitoring-extension/master/nginx_custom.png)
 
-##Contributing
+## Contributing
 
 Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/nginx-monitoring-extension).
 
-##Community
+## Community
 
 Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/Extensions/Nginx-Monitoring-Extension/idi-p/895) community.
 
-##Support
+## Support
 
 For any questions or feature request, please contact [AppDynamics Center of Excellence](mailto:help@appdynamics.com).
