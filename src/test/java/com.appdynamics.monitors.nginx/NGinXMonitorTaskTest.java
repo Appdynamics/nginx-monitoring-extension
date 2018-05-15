@@ -9,6 +9,7 @@ package com.appdynamics.monitors.nginx;
 
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.util.MetricWriteHelper;
+import com.appdynamics.monitors.nginx.util.NGinXMonitorUtils;
 import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -36,7 +37,7 @@ import static org.mockito.Mockito.*;
 
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(EntityUtils.class)
+@PrepareForTest({EntityUtils.class, NGinXMonitorUtils.class})
 public class NGinXMonitorTaskTest {
     private NGinXMonitorTask nGinXMonitorTask;
     private MonitorConfiguration configuration;
@@ -69,6 +70,9 @@ public class NGinXMonitorTaskTest {
         when(configuration.getMetricPrefix()).thenReturn("prefix");
         PowerMockito.mockStatic(EntityUtils.class);
         when(configuration.getMetricWriter()).thenReturn(metricWriter);
+
+        PowerMockito.mockStatic(NGinXMonitorUtils.class);
+        when(NGinXMonitorUtils.getEnvDataForUrl(anyMap())).thenReturn(server);
     }
 
     @Test

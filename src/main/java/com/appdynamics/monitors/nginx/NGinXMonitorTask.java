@@ -10,6 +10,7 @@ package com.appdynamics.monitors.nginx;
 import com.appdynamics.extensions.conf.MonitorConfiguration;
 import com.appdynamics.extensions.http.UrlBuilder;
 import com.appdynamics.extensions.util.MetricWriteHelper;
+import com.appdynamics.monitors.nginx.util.NGinXMonitorUtils;
 import com.singularity.ee.agent.systemagent.api.MetricWriter;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.apache.http.HttpEntity;
@@ -29,10 +30,10 @@ public class NGinXMonitorTask implements Runnable {
 
     public static final Logger logger = Logger.getLogger(NGinXMonitor.class);
     private static final String METRIC_SEPARATOR = "|";
-    private Map server;
+    private Map <String, String> server;
     private MonitorConfiguration configuration;
 
-    public NGinXMonitorTask(MonitorConfiguration configuration, Map server) {
+    public NGinXMonitorTask(MonitorConfiguration configuration, Map <String, String> server) {
         this.configuration = configuration;
         this.server = server;
     }
@@ -53,7 +54,8 @@ public class NGinXMonitorTask implements Runnable {
         CloseableHttpClient httpClient = configuration.getHttpClient();
         CloseableHttpResponse response = null;
         try {
-            String url = UrlBuilder.fromYmlServerConfig(server).build();
+            Map<String, String> modifiedServer = NGinXMonitorUtils.getEnvDataForUrl(server);
+            String url = UrlBuilder.fromYmlServerConfig(modifiedServer).build();
             HttpGet get = new HttpGet(url);
             response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();

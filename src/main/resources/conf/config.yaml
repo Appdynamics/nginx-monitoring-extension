@@ -1,17 +1,23 @@
-#prefix used to show up metrics in AppDynamics
-metricPrefix:  "Custom Metrics|WebServer|NGinX"
+# This will publish metrics to ONE tier only (recommended).
+# Refer to the 'Metric Path' section of https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
+# for instructions on how to retrieve the TIER_ID
 
-#This will create it in specific Tier. Replace <TIER_ID>
-#metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|NginX Monitor|"
+#metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|NGINX Monitor" #use if sim is disabled
+
+metricPrefix:  "Custom Metrics|NGINX Monitor" #use only if sim is enabled
 
 servers:
-  - uri: "http://demo.nginx.com/status"
-    name: "NGinX Monitor1" # mandatory
+  - uri: "" # Please configure your endpoint as HOST_ENV_VARIABLE:PORT_ENV_VARIABLE
+    name: "" # Mandatory
 #   filter:
 #      pools:
 #        includes: [.*]
 
+  - uri: ""
+    name: ""
+
+
 connection:
   sslCertCheckEnabled: false
 
-numberOfThreads: 5
+numberOfThreads: 15
