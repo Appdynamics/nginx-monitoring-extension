@@ -38,7 +38,7 @@ public class NGinXMonitor extends AManagedMonitor {
     protected void initialize(Map<String, String> argsMap) {
         if (configuration == null) {
             MetricWriteHelper metricWriter = MetricWriteHelperFactory.create(this);
-            MonitorConfiguration conf = new MonitorConfiguration("Custom Metrics|WebServer|NGinX", new TaskRunner(),metricWriter);
+            MonitorConfiguration conf = new MonitorConfiguration("Custom Metrics|NGinX", new TaskRunner(),metricWriter);
             final String configFilePath = argsMap.get("config-file");
             conf.setConfigYml(configFilePath);
             conf.checkIfInitialized(MonitorConfiguration.ConfItem.METRIC_PREFIX, MonitorConfiguration.ConfItem.CONFIG_YML, MonitorConfiguration.ConfItem.HTTP_CLIENT
@@ -76,12 +76,5 @@ public class NGinXMonitor extends AManagedMonitor {
             }
         }
         return null;
-    }
-
-    public static void main(String [] arg) throws TaskExecutionException {
-        NGinXMonitor monitor = new NGinXMonitor();
-        Map<String, String> args = Maps.newHashMap();
-        args.put("config-file", "/Users/aditya.jagtiani/repos/appdynamics/extensions/nginx-monitoring-extension/src/main/resources/conf/config.yaml");
-        monitor.execute(args, null);
     }
 }

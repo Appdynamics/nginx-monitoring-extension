@@ -13,10 +13,6 @@ servers:
 #      pools:
 #        includes: [.*]
 
-  - uri: ""
-    name: ""
-
-
 connection:
   sslCertCheckEnabled: false
 

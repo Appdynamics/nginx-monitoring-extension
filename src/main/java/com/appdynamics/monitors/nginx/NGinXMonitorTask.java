@@ -55,7 +55,7 @@ public class NGinXMonitorTask implements Runnable {
         CloseableHttpResponse response = null;
         try {
             Map<String, String> modifiedServer = NGinXMonitorUtils.getEnvDataForUrl(server);
-            String url = UrlBuilder.fromYmlServerConfig(modifiedServer).build();
+            String url = "http://" + UrlBuilder.fromYmlServerConfig(modifiedServer).build() + "/status";
             HttpGet get = new HttpGet(url);
             response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
