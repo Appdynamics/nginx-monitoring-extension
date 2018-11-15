@@ -17,10 +17,41 @@
 package com.appdynamics.monitors.nginx.statsExtractor;
 
 
+import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.monitors.nginx.Config.MetricConfig;
+import com.appdynamics.monitors.nginx.Config.MetricConverter;
+import com.appdynamics.monitors.nginx.Config.Stat;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public interface StatsExtractor {
-    Map<String, String> extractStats(JSONObject respJson);
+public abstract class StatsExtractor {
+
+    public  static final Logger logger = LoggerFactory.getLogger(StatsExtractor.class);
+    public abstract List<Metric> extractStats(JSONObject respJson, Stat stat, String metricPrefix);
+
+    public Map<String, MetricConfig> getmetricConfigMap(MetricConfig[] metricConfigs){
+        Map<String, MetricConfig> configMap = new HashMap<>();
+        for(MetricConfig config : metricConfigs) {
+            configMap.put(config.getAttr(), config);
+        }
+        return configMap;
+    }
+
+    /**
+     * @param converters
+     * @param status
+     * @return
+     */
+    public String getConvertedStatus(MetricConverter[] converters, String status) {
+        for (MetricConverter converter : converters) {
+            if (converter.getLabel().equals(status))
+                return converter.getValue();
+        }
+        return "";
+    }
 }

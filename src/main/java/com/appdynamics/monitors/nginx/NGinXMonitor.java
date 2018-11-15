@@ -7,73 +7,90 @@
 
 package com.appdynamics.monitors.nginx;
 
-import com.appdynamics.extensions.conf.MonitorConfiguration;
-import com.appdynamics.extensions.util.MetricWriteHelper;
-import com.appdynamics.extensions.util.MetricWriteHelperFactory;
-import com.singularity.ee.agent.systemagent.api.AManagedMonitor;
-import com.singularity.ee.agent.systemagent.api.TaskExecutionContext;
-import com.singularity.ee.agent.systemagent.api.TaskOutput;
+import com.appdynamics.extensions.ABaseMonitor;
+import com.appdynamics.extensions.TasksExecutionServiceProvider;
+import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.util.AssertUtils;
+import com.appdynamics.monitors.nginx.Config.Stat;
+import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
+
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by adityajagtiani on 8/31/16.
  */
-public class NGinXMonitor extends AManagedMonitor {
-    public static final Logger logger = LoggerFactory.getLogger(NGinXMonitor.class);
-    private MonitorConfiguration configuration;
+public class NGinXMonitor extends ABaseMonitor {
+    public static final Logger logger = Logger.getLogger(NGinXMonitor.class);
+    private MonitorContextConfiguration monitorContextConfiguration;
+    private Map<String, ?> configYml = Maps.newHashMap();
 
-    public NGinXMonitor() {
-        logger.info(String.format("Using NGinXMonitor Version [%s]", getImplementationVersion()));
+    @Override
+    protected String getDefaultMetricPrefix() {
+        return Constant.METRIC_PREFIX;
     }
 
-    private static String getImplementationVersion() {
-        return NGinXMonitor.class.getPackage().getImplementationTitle();
+    @Override
+    public String getMonitorName() {
+        return Constant.MonitorName;
     }
 
-    protected void initialize(Map<String, String> argsMap) {
-        if (configuration == null) {
-            MetricWriteHelper metricWriter = MetricWriteHelperFactory.create(this);
-            MonitorConfiguration conf = new MonitorConfiguration("Custom Metrics|WebServer|NGinX", new TaskRunner(),metricWriter);
-            final String configFilePath = argsMap.get("config-file");
-            conf.setConfigYml(configFilePath);
-            conf.checkIfInitialized(MonitorConfiguration.ConfItem.METRIC_PREFIX, MonitorConfiguration.ConfItem.CONFIG_YML, MonitorConfiguration.ConfItem.HTTP_CLIENT
-                    , MonitorConfiguration.ConfItem.EXECUTOR_SERVICE);
-            this.configuration = conf;
-        }
-    }
-
-    private class TaskRunner implements Runnable{
-
-        @Override
-        public void run () {
-            Map<String, ?> config = configuration.getConfigYml();
-            List<Map> servers = (List) config.get("servers");
-            if (servers != null && !servers.isEmpty()) {
-                for (Map server : servers) {
-                    NGinXMonitorTask task = new NGinXMonitorTask(configuration, server);
-                    configuration.getExecutorService().execute(task);
-                }
-            } else {
-                logger.error("The stats read from the metric xml is empty. Please make sure that the metrics xml is correct");
-            }
-        }
-    }
-
-    public TaskOutput execute(Map<String, String> map, TaskExecutionContext taskExecutionContext) throws TaskExecutionException {
-        logger.debug("The raw arguments are {}", map);
+    @Override
+    protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
         try {
-            initialize(map);
-            configuration.executeTask();
-        }
-        catch(Exception e){
-            if(configuration != null && configuration.getMetricWriter() != null) {
-                configuration.getMetricWriter().registerError(e.getMessage(), e);
+            List<Map<String, ?>> nginxServers = (List<Map<String, ?>>) configYml.get("servers");
+            AssertUtils.assertNotNull(configYml, "The config.yml is not available");
+            AssertUtils.assertNotNull(this.getContextConfiguration().getMetricsXml(), "Metrics xml not available");
+
+            for (Map<String, ?> server : nginxServers) {
+                logger.info("Starting the Nginx Monitoring Task for log : " + server.get("displayName"));
+
+                AssertUtils.assertNotNull(server, "the server arguments are empty");
+                NGinXMonitorTask task = new NGinXMonitorTask(monitorContextConfiguration, tasksExecutionServiceProvider.getMetricWriteHelper(), server);
+                AssertUtils.assertNotNull(server.get("displayName"), "The displayName can not be null");
+                tasksExecutionServiceProvider.submit((String) server.get("displayName"), task);
             }
+        } catch (Exception e) {
+            logger.error("Nginx servers Metrics collection failed", e);
         }
-        return null;
+    }
+
+    @Override
+    protected int getTaskCount() {
+        List<Map<String, ?>> servers = (List<Map<String, ?>>) getContextConfiguration().getConfigYml().get("servers");
+        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
+        return servers.size();
+    }
+
+    @Override
+    protected void initializeMoreStuff(Map<String, String> args) {
+        monitorContextConfiguration = getContextConfiguration();
+        configYml = monitorContextConfiguration.getConfigYml();
+        logger.info("initializing metric.xml file");
+        this.getContextConfiguration().setMetricXml(args.get("metric-file"), Stat.Stats.class);
+    }
+
+    public static void main(String[] args) throws TaskExecutionException {
+
+        ConsoleAppender ca = new ConsoleAppender();
+        ca.setWriter(new OutputStreamWriter(System.out));
+        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+        ca.setThreshold(Level.DEBUG);
+        logger.getRootLogger().addAppender(ca);
+        NGinXMonitor monitor = new NGinXMonitor();
+
+        final Map<String, String> taskArgs = new HashMap<>();
+        taskArgs.put("config-file", "src/main/resources/conf/config.yml");
+        taskArgs.put("metric-file", "src/main/resources/conf/metrics.xml");
+
+        monitor.execute(taskArgs, null);
+
     }
 }

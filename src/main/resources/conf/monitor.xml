@@ -19,7 +19,7 @@
         <type>java</type>
         <execution-timeout-in-secs>60</execution-timeout-in-secs>
         <task-arguments>
-            <argument name="config-file" is-required="true" default-value="monitors/NGinXMonitor/config.yaml" />
+            <argument name="config-file" is-required="true" default-value="monitors/NGinXMonitor/config.yml" />
             <!-- Optional Properties  -->
             <!--<argument name="metric-prefix" is-required="false" default-value="Custom Metrics|WebServer|NGinX"/>-->
 

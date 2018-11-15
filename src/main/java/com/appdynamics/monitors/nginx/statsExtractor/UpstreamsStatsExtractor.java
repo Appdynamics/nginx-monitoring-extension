@@ -16,159 +16,125 @@
 
 package com.appdynamics.monitors.nginx.statsExtractor;
 
+import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.monitors.nginx.Config.MetricConfig;
+import com.appdynamics.monitors.nginx.Config.Stat;
+import com.google.common.collect.Lists;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 
-public class UpstreamsStatsExtractor implements StatsExtractor {
+public class UpstreamsStatsExtractor extends StatsExtractor {
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public Map<String, String> extractStats(JSONObject respJson) {
+    public List<Metric> extractStats(JSONObject upstreams, Stat stat, String metricPrefix) {
+        List<Metric> upstreamsStatsMetrics = Lists.newArrayList();
+        try {
+            Set<String> serverGroupNames = upstreams.keySet();
 
-        JSONObject upstreams = respJson.getJSONObject("upstreams");
+            for (String serverGroupName : serverGroupNames) {
+                JSONObject jsonObject = upstreams.getJSONObject(serverGroupName);
 
-        int version = respJson.getInt("version");
+                Set<String> keys = jsonObject.keySet();
+                for (String key : keys) {
+                    Object element = jsonObject.get(key);
 
-        Map<String, String> upstreamsStats = new HashMap<String, String>();
-        if(version == 6) {
-            upstreamsStats = getUpstreamsStatsV6(upstreams);
-        } else if(version == 5) {
-            upstreamsStats = getUpstreamsStatsV5(upstreams);
-        }
-        return upstreamsStats;
-    }
+                    if (element instanceof JSONArray) {
+                        JSONArray serverGroups = (JSONArray) element;
 
-    private Map<String, String> getUpstreamsStatsV5(JSONObject upstreams) {
-        Map<String, String> upstreamsStats = new HashMap<String, String>();
-        Set<String> serverGroupNames = upstreams.keySet();
-
-        for(String serverGroupName : serverGroupNames) {
-            JSONArray serverGroups = upstreams.getJSONArray(serverGroupName);
-
-            for (int i = 0; i < serverGroups.length(); i++) {
-                JSONObject server = serverGroups.getJSONObject(i);
-                collectMetrics(upstreamsStats, serverGroupName, server);
-            }
-
-        }
-
-        return upstreamsStats;
-    }
-
-    private Map<String, String> getUpstreamsStatsV6(JSONObject upstreams) {
-        Map<String, String> upstreamsStats = new HashMap<String, String>();
-        Set<String> serverGroupNames = upstreams.keySet();
-
-        for (String serverGroupName : serverGroupNames) {
-            JSONObject jsonObject = upstreams.getJSONObject(serverGroupName);
-
-            Set<String> keys = jsonObject.keySet();
-            for (String key : keys) {
-                Object element = jsonObject.get(key);
-
-                if (element instanceof JSONArray) {
-                    JSONArray serverGroups = (JSONArray)element;
-
-                    for (int i = 0; i < serverGroups.length(); i++) {
-                        JSONObject server = serverGroups.getJSONObject(i);
-                        collectMetrics(upstreamsStats, serverGroupName, server);
+                        for (int i = 0; i < serverGroups.length(); i++) {
+                            JSONObject server = serverGroups.getJSONObject(i);
+                            upstreamsStatsMetrics.addAll(collectUpStreamMetrics(serverGroupName, server, stat, metricPrefix));
+                        }
                     }
                 }
             }
+        } catch (Exception e) {
+            logger.error("Unexpected error while collecting metrics for upstream stat", e);
         }
-        return upstreamsStats;
+        return upstreamsStatsMetrics;
     }
 
-    private void collectMetrics(Map<String, String> upstreamsStats, String serverGroupName, JSONObject server) {
-
-
+    private List<Metric> collectUpStreamMetrics(String serverGroupName, JSONObject server, Stat stat, String metricPrefix) {
+        Map<String, MetricConfig> configMetricsMap = getmetricConfigMap(stat.getMetricConfig());
+        List<Metric> upStreamMetrics = Lists.newArrayList();
         String serverIp = server.getString("server");
-
-        boolean backup = server.getBoolean("backup");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|backup", backup ? "1" : "0");
-
-        long weight = server.getLong("weight");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|weight", String.valueOf(weight));
-
-        // “up”, “down”, “unavail”, or “unhealthy”.
-        String state = server.getString("state");
-        int stateInt = -1;
-        if ("up".equals(state)) {
-            stateInt = 0;
-        } else if ("down".equals(state)) {
-            stateInt = 1;
-        } else if ("unavail".equals(state)) {
-            stateInt = 2;
-        } else if ("unhealthy".equals(state)) {
-            stateInt = 3;
-        }
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|state", String.valueOf(stateInt));
-
-        long active = server.getLong("active");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|active", String.valueOf(active));
-
-        if (server.has("max_conns")) {
-            long maxConns = server.getLong("max_conns");
-            upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|max_conns", String.valueOf(maxConns));
+        Set<String> keySet = server.keySet();
+        if (configMetricsMap.containsKey("backup") && server.has("backup")) {
+            MetricConfig config = configMetricsMap.get("backup");
+            Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
+            boolean backup = server.getBoolean("backup");
+            Metric metric = new Metric(config.getAlias(), backup ? "1" : "0", metricPrefix + serverGroupName + "|" + serverIp + "|backup", propertiesMap);
+            upStreamMetrics.add(metric);
         }
 
-        long requests = server.getLong("requests");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|requests", String.valueOf(requests));
+        if (configMetricsMap.containsKey("responses") && server.has("responses"))
+            upStreamMetrics.addAll(collectUpStreamResponseMetrics(serverGroupName, server, metricPrefix, configMetricsMap.get("responses")));
 
+        if (configMetricsMap.containsKey("health_checks") && server.has("health_checks"))
+            upStreamMetrics.addAll(collectUpStreamHealthCheckMetrics(serverGroupName, server, metricPrefix, configMetricsMap.get("health_checks")));
+
+        keySet.removeAll(Arrays.asList("backup", "responses", "health_checks", "downstart"));
+        String metricValue;
+        for (String key : keySet) {
+            if (configMetricsMap.containsKey(key) && server.has(key)) {
+                MetricConfig config = configMetricsMap.get(key);
+                if (config.getMetricConverter() != null)
+                    metricValue = getConvertedStatus(config.getMetricConverter(), server.getString(key));
+                else
+                    metricValue = String.valueOf(server.getLong(key));
+                Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
+                Metric metric = new Metric(config.getAlias(), metricValue, metricPrefix + serverGroupName + "|" + serverIp + "|" + config.getAttr(), propertiesMap);
+                upStreamMetrics.add(metric);
+            }
+        }
+        return upStreamMetrics;
+    }
+
+    private List<Metric> collectUpStreamResponseMetrics(String serverGroupName, JSONObject server, String metricPrefix, MetricConfig config) {
+        List<Metric> responseMetricsList = Lists.newArrayList();
+        Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
+        String serverIp = server.getString("server");
         JSONObject responses = server.getJSONObject("responses");
-        long resp1xx = responses.getLong("1xx");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|responses|1xx", String.valueOf(resp1xx));
 
-        long resp2xx = responses.getLong("2xx");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|responses|2xx", String.valueOf(resp2xx));
+        Set<String> keySet = responses.keySet();
+        for (String key : keySet) {
+            long resp1xx = responses.getLong(key);
+            Metric metric = new Metric(key, String.valueOf(resp1xx), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|responses|" + key, propertiesMap);
+            responseMetricsList.add(metric);
+        }
+        return responseMetricsList;
+    }
 
-        long resp3xx = responses.getLong("3xx");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|responses|3xx", String.valueOf(resp3xx));
-
-        long resp4xx = responses.getLong("4xx");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|responses|4xx", String.valueOf(resp4xx));
-
-        long resp5xx = responses.getLong("5xx");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|responses|5xx", String.valueOf(resp5xx));
-
-        long respTotal = responses.getLong("total");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|responses|total", String.valueOf(respTotal));
-
-        long sent = server.getLong("sent");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|sent", String.valueOf(sent));
-
-        long received = server.getLong("received");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|received", String.valueOf(received));
-
-        long upstreamServerFails = server.getLong("fails");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|fails", String.valueOf(upstreamServerFails));
-
-        long unavail = server.getLong("unavail");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|unavail", String.valueOf(unavail));
-
+    private List<Metric> collectUpStreamHealthCheckMetrics(String serverGroupName, JSONObject server, String metricPrefix, MetricConfig config) {
+        List<Metric> healthCheckMetricsList = Lists.newArrayList();
+        String serverIp = server.getString("server");
+        Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
         JSONObject healthChecks = server.getJSONObject("health_checks");
         long checks = healthChecks.getLong("checks");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|checks", String.valueOf(checks));
+        Metric metric = new Metric("Checks", String.valueOf(checks), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|checks", propertiesMap);
+        healthCheckMetricsList.add(metric);
 
         long healthCheckFails = healthChecks.getLong("fails");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|fails", String.valueOf(healthCheckFails));
+        metric = new Metric("Fails", String.valueOf(healthCheckFails), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|fails", propertiesMap);
+        healthCheckMetricsList.add(metric);
 
         long unhealthy = healthChecks.getLong("unhealthy");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|unhealthy", String.valueOf(unhealthy));
+        metric = new Metric("Unhealthy", String.valueOf(unhealthy), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|unhealthy", propertiesMap);
+        healthCheckMetricsList.add(metric);
 
         if (server.has("last_passed")) {
             boolean lastPassed = healthChecks.getBoolean("last_passed");
-            upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|last_passed", String.valueOf(lastPassed ? 0 : 1));
+            metric = new Metric("Last Passed", String.valueOf(lastPassed ? 0 : 1), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|last_passed", propertiesMap);
+            healthCheckMetricsList.add(metric);
         }
-
-        long downtime = server.getLong("downtime");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|downtime", String.valueOf(downtime));
-
-        long downstart = server.getLong("downstart");
-        upstreamsStats.put("upstreams|" + serverGroupName + "|" + serverIp + "|downstart", String.valueOf(downstart));
+        return healthCheckMetricsList;
     }
 }

@@ -7,10 +7,15 @@
 
 package com.appdynamics.monitors.nginx;
 
+import com.appdynamics.extensions.metrics.Metric;
+import com.appdynamics.monitors.nginx.Config.MetricConfig;
+import com.google.common.collect.Lists;
+import org.codehaus.jackson.map.ObjectMapper;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,35 +24,56 @@ import java.util.regex.Pattern;
  * Created by adityajagtiani on 10/10/16.
  */
 public class PlainTextResponseParser {
+    ObjectMapper objectMapper = new ObjectMapper();
 
-    public PlainTextResponseParser() {}
-
-    public Map<String, String> parseResponse (String responseBody) throws IOException {
-        Map <String, String> resultMap = new HashMap<String, String>();
+    public List<Metric> parseResponse(String responseBody, MetricConfig[] metricConfigs, String metricPrefix) throws IOException {
+        List<Metric> resultList = Lists.newArrayList();
         Pattern numPattern = Pattern.compile("\\d+");
-        Matcher numMatcher;
         BufferedReader reader = new BufferedReader(new StringReader(responseBody));
         String line, whiteSpaceRegex = "\\s";
-
+        String currAttr;
         while ((line = reader.readLine()) != null) {
-            if (line.contains("Active connections")) {
-                numMatcher = numPattern.matcher(line);
-                if(numMatcher.find()) {
-                    resultMap.put("Active Connections", numMatcher.group());
+            currAttr = "Active connections";
+            if (line.contains(currAttr)) {
+                Matcher numMatcher = numPattern.matcher(line);
+                if (numMatcher.find()) {
+                    addValueToMetricList(numMatcher.group(),  metricConfigs, currAttr, metricPrefix, resultList);
                 }
             } else if (line.contains("server")) {
                 line = reader.readLine();
                 String[] results = line.trim().split(whiteSpaceRegex);
-                resultMap.put("Server|Accepts", results[0]);
-                resultMap.put("Server|Handled", results[1]);
-                resultMap.put("Server|Requests", results[2]);
+                currAttr = "Server|Accepts";
+                addValueToMetricList(results[0],  metricConfigs, currAttr, metricPrefix, resultList);
+                currAttr = "Server|Handled";
+                addValueToMetricList(results[1],  metricConfigs, currAttr, metricPrefix, resultList);
+                currAttr = "Server|Requests";
+                addValueToMetricList(results[2],  metricConfigs, currAttr, metricPrefix, resultList);
             } else if (line.contains("Reading")) {
                 String[] results = line.trim().split(whiteSpaceRegex);
-                resultMap.put("Reading", results[1]);
-                resultMap.put("Writing", results[3]);
-                resultMap.put("Waiting", results[5]);
+                currAttr = "Reading";
+                addValueToMetricList(results[1],  metricConfigs, currAttr, metricPrefix, resultList);
+                currAttr = "Writing";
+                addValueToMetricList(results[3],  metricConfigs, currAttr, metricPrefix, resultList);
+                currAttr = "Waiting";
+                addValueToMetricList(results[5],  metricConfigs, currAttr, metricPrefix, resultList);
             }
         }
-        return resultMap;
+        return resultList;
+    }
+
+    private MetricConfig getMatchedConfig(String key, MetricConfig[] configs) {
+        for (MetricConfig config : configs) {
+            if (config.getAttr().equals(key))
+                return config;
+        }
+        return null;
+    }
+    private void addValueToMetricList(String metricValue,  MetricConfig[] metricConfigs,String metricAttr, String metricPrefix, List<Metric> resultList){
+        MetricConfig config = getMatchedConfig(metricAttr, metricConfigs);
+        if(config != null) {
+            Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
+            Metric metric = new Metric(metricAttr, metricValue, metricPrefix + metricAttr, propertiesMap);
+            resultList.add(metric);
+        }
     }
 }
