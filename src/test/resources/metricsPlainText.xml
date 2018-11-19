@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright 2018. AppDynamics LLC and its affiliates.
+  ~ All Rights Reserved.
+  ~ This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
+  ~ The copyright notice above does not evidence any actual or intended publication of such source code.
+  -->
+
+<!--
+aggregationType = AVERAGE | SUM | OBSERVATION
+timeRollUpType = AVERAGE | SUM | CURRENT
+clusterRollUpType = INDIVIDUAL | COLLECTIVE
+-->
+<!--
+Set delta = true for metric to report per-min data
+-->
+<stats url="/api/3">
+    <stat suburl="" name="plain-text">
+        <metric attr="Active connections" alias="Active Connections" aggregationType = "OBSERVATION" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+        <metric attr="Server|Accepts" alias="Accepts" aggregationType = "OBSERVATION" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+        <metric attr="Server|Handled" alias="Handled" aggregationType = "OBSERVATION" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+        <metric attr="Server|Requests" alias="Requests" aggregationType = "OBSERVATION" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+        <metric attr="Reading" alias="Reading" aggregationType = "OBSERVATION" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+        <metric attr="Writing" alias="Writing" aggregationType = "OBSERVATION" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+        <metric attr="Waiting" alias="Waiting" aggregationType = "OBSERVATION" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+    </stat>
+</stats>

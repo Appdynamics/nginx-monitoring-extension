@@ -14,15 +14,6 @@ clusterRollUpType = INDIVIDUAL | COLLECTIVE
 Set delta = true for metric to report per-min data
 -->
 <stats url="/api/3">
-    <stat suburl="" name="plain-text">
-        <metric attr="Active connections" alias="Active Connections" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
-        <metric attr="Server|Accepts" alias="Accepts" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
-        <metric attr="Server|Handled" alias="Handled" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
-        <metric attr="Server|Requests" alias="Requests" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
-        <metric attr="Reading" alias="Reading" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
-        <metric attr="Writing" alias="Writing" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
-        <metric attr="Waiting" alias="Waiting" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
-    </stat>
     <stat suburl="processes" name="Processes-Status">
         <metric attr="respawned" alias="Respawned" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
     </stat>
@@ -69,10 +60,10 @@ Set delta = true for metric to report per-min data
             <metric attr="backup" alias="BackUp" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="weight" alias="Weight" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="state" alias="State" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE">
-            <convert str="up" value="0"/>
-            <convert str="down" value="1"/>
-            <convert str="unavail" value="2"/>
-            <convert str="unhealthy" value="3"/>
+                <convert str="up" value="0"/>
+                <convert str="down" value="1"/>
+                <convert str="unavail" value="2"/>
+                <convert str="unhealthy" value="3"/>
             </metric>
             <metric attr="active" alias="Active" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="max_conns" alias="Max conns" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
@@ -90,7 +81,7 @@ Set delta = true for metric to report per-min data
         <stat suburl="keyvals" name="Keyvals">
         </stat>
     </stat>
-    <stat suburl="stream" name="HTTP-Endpoints">
+    <stat suburl="stream" name="Stream">
         <stat suburl="server_zones" name="Server-Zones">
             <metric attr="processing" alias="Processing" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="connections" alias="Connections" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
@@ -103,10 +94,10 @@ Set delta = true for metric to report per-min data
             <metric attr="backup" alias="BackUp" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="weight" alias="Weight" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="state" alias="State" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE">
-            <convert str="up" value="0"/>
-            <convert str="down" value="1"/>
-            <convert str="unavail" value="2"/>
-            <convert str="unhealthy" value="3"/>
+                <convert str="up" value="0"/>
+                <convert str="down" value="1"/>
+                <convert str="unavail" value="2"/>
+                <convert str="unhealthy" value="3"/>
             </metric>
             <metric attr="active" alias="Active" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="max_conns" alias="Max conns" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>

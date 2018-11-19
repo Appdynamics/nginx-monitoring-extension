@@ -107,7 +107,7 @@ public class UpstreamsStatsExtractor extends StatsExtractor {
         Set<String> keySet = responses.keySet();
         for (String key : keySet) {
             long resp1xx = responses.getLong(key);
-            Metric metric = new Metric(key, String.valueOf(resp1xx), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|responses|" + key, propertiesMap);
+            Metric metric = new Metric(key, String.valueOf(resp1xx), metricPrefix + serverGroupName + "|" + serverIp + "|responses|" + key, propertiesMap);
             responseMetricsList.add(metric);
         }
         return responseMetricsList;
@@ -119,20 +119,20 @@ public class UpstreamsStatsExtractor extends StatsExtractor {
         Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
         JSONObject healthChecks = server.getJSONObject("health_checks");
         long checks = healthChecks.getLong("checks");
-        Metric metric = new Metric("Checks", String.valueOf(checks), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|checks", propertiesMap);
+        Metric metric = new Metric("Checks", String.valueOf(checks), metricPrefix +  serverGroupName + "|" + serverIp + "|health_checks|checks", propertiesMap);
         healthCheckMetricsList.add(metric);
 
         long healthCheckFails = healthChecks.getLong("fails");
-        metric = new Metric("Fails", String.valueOf(healthCheckFails), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|fails", propertiesMap);
+        metric = new Metric("Fails", String.valueOf(healthCheckFails), metricPrefix +serverGroupName + "|" + serverIp + "|health_checks|fails", propertiesMap);
         healthCheckMetricsList.add(metric);
 
         long unhealthy = healthChecks.getLong("unhealthy");
-        metric = new Metric("Unhealthy", String.valueOf(unhealthy), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|unhealthy", propertiesMap);
+        metric = new Metric("Unhealthy", String.valueOf(unhealthy), metricPrefix +serverGroupName + "|" + serverIp + "|health_checks|unhealthy", propertiesMap);
         healthCheckMetricsList.add(metric);
 
         if (server.has("last_passed")) {
             boolean lastPassed = healthChecks.getBoolean("last_passed");
-            metric = new Metric("Last Passed", String.valueOf(lastPassed ? 0 : 1), metricPrefix + "upstreams|" + serverGroupName + "|" + serverIp + "|health_checks|last_passed", propertiesMap);
+            metric = new Metric("Last Passed", String.valueOf(lastPassed ? 0 : 1), metricPrefix +serverGroupName + "|" + serverIp + "|health_checks|last_passed", propertiesMap);
             healthCheckMetricsList.add(metric);
         }
         return healthCheckMetricsList;

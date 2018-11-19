@@ -14,13 +14,8 @@ import com.appdynamics.extensions.util.AssertUtils;
 import com.appdynamics.monitors.nginx.Config.Stat;
 import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
 
-import java.io.OutputStreamWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -79,18 +74,18 @@ public class NGinXMonitor extends ABaseMonitor {
 
     public static void main(String[] args) throws TaskExecutionException {
 
-        ConsoleAppender ca = new ConsoleAppender();
-        ca.setWriter(new OutputStreamWriter(System.out));
-        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
-        ca.setThreshold(Level.DEBUG);
-        logger.getRootLogger().addAppender(ca);
-        NGinXMonitor monitor = new NGinXMonitor();
-
-        final Map<String, String> taskArgs = new HashMap<>();
-        taskArgs.put("config-file", "src/main/resources/conf/config.yml");
-        taskArgs.put("metric-file", "src/main/resources/conf/metrics.xml");
-
-        monitor.execute(taskArgs, null);
+//        ConsoleAppender ca = new ConsoleAppender();
+//        ca.setWriter(new OutputStreamWriter(System.out));
+//        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
+//        ca.setThreshold(Level.DEBUG);
+//        logger.getRootLogger().addAppender(ca);
+//        NGinXMonitor monitor = new NGinXMonitor();
+//
+//        final Map<String, String> taskArgs = new HashMap<>();
+//        taskArgs.put("config-file", "src/main/resources/conf/config.yml");
+//        taskArgs.put("metric-file", "src/main/resources/conf/metrics.xml");
+//
+//        monitor.execute(taskArgs, null);
 
     }
 }

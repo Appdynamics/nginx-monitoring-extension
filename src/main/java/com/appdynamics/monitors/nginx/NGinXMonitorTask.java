@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,26 +54,28 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
     }
 
     public void run() {
+        List<Metric> metricList = Lists.newArrayList();
         try {
             Map<String, String> requestMap = buildRequestMap();
-            populateMetrics(requestMap);
+            populateMetrics(requestMap, metricList);
             logger.info("Completed the Nginx Monitoring task");
         } catch (Exception e) {
             logger.error("Error while running the task " + server.get("displayName") + e);
         }finally {
             String prefix = metricPrefix + METRIC_SEPARATOR + "HeartBeat";
             Metric heartBeat = new Metric("HeartBeat", String.valueOf(heartBeatValue), prefix);
-            metricWriteHelper.transformAndPrintMetrics(Arrays.asList(heartBeat));
+            metricList.add(heartBeat);
+            metricWriteHelper.transformAndPrintMetrics(metricList);
         }
     }
 
 
-    private void populateMetrics(Map<String, String> requestMap) throws IOException, TaskExecutionException {
+    private void populateMetrics(Map<String, String> requestMap, List<Metric> metricList) throws IOException, TaskExecutionException {
         heartBeatValue = BigInteger.ONE;
         try {
             String url = UrlBuilder.builder(requestMap).build();
             if (server.get("nginx_plus").equals("false")) {
-                populatePlainTextMetrics(url);
+               metricList.addAll(populatePlainTextMetrics(url));
             } else {
                 Stat[] stats = ((Stat.Stats) configuration.getMetricsXml()).getStats();
                 url = url + ((Stat.Stats) configuration.getMetricsXml()).getUrl() + "/";
@@ -101,7 +102,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
         }
     }
 
-    private void populatePlainTextMetrics(String url){
+    private List<Metric> populatePlainTextMetrics(String url){
         CloseableHttpResponse response = null;
         List<Metric> metricsResultList = Lists.newArrayList();
         try {
@@ -113,7 +114,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
             AssertUtils.assertNotNull(responseBody, "response of the request is empty");
             String header = response.getFirstHeader("Content-Type").getValue();
             if (header != null && header.contains("text/plain")) {
-                MetricConfig[] metricConfigs = getPainTestConfigs(((Stat.Stats) configuration.getMetricsXml()).getStats());
+                MetricConfig[] metricConfigs = getPlainTestConfigs(((Stat.Stats) configuration.getMetricsXml()).getStats());
                 PlainTextResponseParser plainTextParser = new PlainTextResponseParser();
                 metricsResultList = plainTextParser.parseResponse(responseBody, metricConfigs, metricPrefix + "|");
             }
@@ -128,7 +129,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
                     e.printStackTrace();
                 }
             }
-            metricWriteHelper.transformAndPrintMetrics(metricsResultList);
+            return metricsResultList;
         }
     }
 
@@ -137,7 +138,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
         logger.info("Completed the Nginx Monitoring task for log : " + server.get("displayName"));
     }
 
-    private MetricConfig[] getPainTestConfigs(Stat[] stats){
+    private MetricConfig[] getPlainTestConfigs(Stat[] stats){
         for(Stat stat : stats){
             if(stat.getName().equals("plain-text"))
                 return stat.getMetricConfig();
