@@ -36,7 +36,7 @@ public class SlabStatsExtractor extends StatsExtractor {
                     for (int pageSize = 8; pageSize <= 2048; pageSize = pageSize << 1) {
                         JSONObject slotPageSizeObj = slabZoneSlotObj.getJSONObject(String.valueOf(pageSize));
                         for (String pageAttr : new String[]{"used", "free", "reqs", "fails"}) {
-                            slabMetricList.add(new Metric(pageAttr, String.valueOf(slotPageSizeObj.getLong(pageAttr)), metricPrefix + slabZoneName + "|slots|" + pageSize + "|" + pageAttr, propertiesMap));
+                            slabMetricList.add(new Metric(pageAttr, String.valueOf(slotPageSizeObj.getLong(pageAttr)), metricPrefix + slabZoneName + "|slots|" + pageSize + METRIC_SEPARATOR + pageAttr, propertiesMap));
                         }
                     }
                 }

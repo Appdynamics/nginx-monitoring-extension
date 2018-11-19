@@ -21,6 +21,7 @@ import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.monitors.nginx.Config.MetricConfig;
 import com.appdynamics.monitors.nginx.Config.MetricConverter;
 import com.appdynamics.monitors.nginx.Config.Stat;
+import com.appdynamics.monitors.nginx.Constant;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public abstract class StatsExtractor {
 
     public  static final Logger logger = LoggerFactory.getLogger(StatsExtractor.class);
     public abstract List<Metric> extractStats(JSONObject respJson, Stat stat, String metricPrefix);
+    public static final String METRIC_SEPARATOR = Constant.METRIC_SEPARATOR;
 
     public Map<String, MetricConfig> getmetricConfigMap(MetricConfig[] metricConfigs){
         Map<String, MetricConfig> configMap = new HashMap<>();

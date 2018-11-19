@@ -52,7 +52,7 @@ public class ServerZoneStatsExtractor extends StatsExtractor {
                         MetricConfig config = configMetricsMap.get(key);
                         Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
                         metricValue = String.valueOf(server.getLong(key));
-                        Metric metric = new Metric(config.getAlias(), metricValue, metricPrefix + "upstreams|" + serverZoneName + "|" + config.getAttr(), propertiesMap);
+                        Metric metric = new Metric(config.getAlias(), metricValue, metricPrefix + "upstreams|" + serverZoneName + METRIC_SEPARATOR + config.getAttr(), propertiesMap);
                         serverZonesMetrics.add(metric);
                     }
                 }
@@ -69,7 +69,7 @@ public class ServerZoneStatsExtractor extends StatsExtractor {
         Set<String> keySet = responses.keySet();
         for (String key : keySet) {
             long resp1xx = responses.getLong(key);
-            Metric metric = new Metric(key, String.valueOf(resp1xx), metricPrefix + "upstreams|" + serverZoneName + "|" + configStr + "|" + key, propertiesMap);
+            Metric metric = new Metric(key, String.valueOf(resp1xx), metricPrefix + "upstreams|" + serverZoneName + METRIC_SEPARATOR + configStr + METRIC_SEPARATOR + key, propertiesMap);
             responseMetricsList.add(metric);
         }
         return responseMetricsList;

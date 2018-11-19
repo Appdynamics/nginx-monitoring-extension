@@ -39,7 +39,7 @@ import java.util.Map;
 public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
 
     public static final Logger logger = Logger.getLogger(NGinXMonitor.class);
-    private static final String METRIC_SEPARATOR = "|";
+    private static final String METRIC_SEPARATOR = Constant.METRIC_SEPARATOR;
     private Map server;
     private MonitorContextConfiguration configuration;
     private MetricWriteHelper metricWriteHelper;
@@ -71,11 +71,10 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
 
 
     private void populateMetrics(Map<String, String> requestMap, List<Metric> metricList) throws IOException, TaskExecutionException {
-        heartBeatValue = BigInteger.ONE;
         try {
             String url = UrlBuilder.builder(requestMap).build();
             if (server.get("nginx_plus").equals("false")) {
-               metricList.addAll(populatePlainTextMetrics(url));
+                metricList.addAll(populatePlainTextMetrics(url));
             } else {
                 Stat[] stats = ((Stat.Stats) configuration.getMetricsXml()).getStats();
                 url = url + ((Stat.Stats) configuration.getMetricsXml()).getUrl() + "/";
@@ -89,14 +88,14 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
                     } else {
                         Stat[] substats = stat.getStats();
                         for (Stat subStat : substats) {
-                            JSONResponseParser jsonResponseParser = new JSONResponseParser(subStat, configuration, metricWriteHelper, metricPrefix + "|" + stat.getSubUrl(), url + stat.getSubUrl() + "/" + subStat.getSubUrl());
+                            JSONResponseParser jsonResponseParser = new JSONResponseParser(subStat, configuration, metricWriteHelper, metricPrefix + METRIC_SEPARATOR + stat.getSubUrl(), url + stat.getSubUrl() + "/" + subStat.getSubUrl());
                             configuration.getContext().getExecutorService().execute("MetricCollector", jsonResponseParser);
                             logger.debug("Starting MetricCollectorTask for " + server.get("displayName") + "for stats " + subStat.getSubUrl());
                         }
                     }
                 }
             }
-
+            heartBeatValue = BigInteger.ONE;
         } catch (Exception e) {
             logger.error("Failed to complete nginx Monitor task{}", e);
         }
@@ -116,7 +115,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
             if (header != null && header.contains("text/plain")) {
                 MetricConfig[] metricConfigs = getPlainTestConfigs(((Stat.Stats) configuration.getMetricsXml()).getStats());
                 PlainTextResponseParser plainTextParser = new PlainTextResponseParser();
-                metricsResultList = plainTextParser.parseResponse(responseBody, metricConfigs, metricPrefix + "|");
+                metricsResultList = plainTextParser.parseResponse(responseBody, metricConfigs, metricPrefix + METRIC_SEPARATOR);
             }
         }catch (Exception e){
             logger.error("Failed to collect nginx plain-text metrics", e);
@@ -161,10 +160,10 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
     }
 
     private String getPassword(){
-        String password = (String) server.get("password");
-        String encryptedPassword = (String) server.get("encryptedPassword");
+        String password = (String) server.get(Constant.PASSWORD);
+        String encryptedPassword = (String) server.get(Constant.ENCRYPTED_PASSWORD);
         Map<String, ?> configMap = configuration.getConfigYml();
-        String encryptionKey = configMap.get("encryptionKey").toString();
+        String encryptionKey = configMap.get(Constant.ENCRYPTION_KEY).toString();
         if(!Strings.isNullOrEmpty(password)){
             return password;
         }

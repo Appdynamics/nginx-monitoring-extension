@@ -68,14 +68,14 @@ public class CacheStatsExtractor extends StatsExtractor {
         MetricConfig config = metricConfigMap.get(key);
         Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
         long size = cache.getLong(key);
-        return new Metric(config.getAlias(), String.valueOf(size), metricPrefix + cacheName + "|" + config.getAttr(), propertiesMap);
+        return new Metric(config.getAlias(), String.valueOf(size), metricPrefix + cacheName + METRIC_SEPARATOR + config.getAttr(), propertiesMap);
     }
 
     private Metric getBooleanMetric(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String key, String metricPrefix, String cacheName){
         MetricConfig config = metricConfigMap.get(key);
         Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
         boolean cold = cache.getBoolean(key);
-        return new Metric(config.getAlias(), String.valueOf(cold ? 0 : 1), metricPrefix + cacheName + "|" + config.getAttr(), propertiesMap);
+        return new Metric(config.getAlias(), String.valueOf(cold ? 0 : 1), metricPrefix + cacheName + METRIC_SEPARATOR + config.getAttr(), propertiesMap);
     }
 
     private List<Metric> getCachePerfMetrics(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String[] cacheAttr, String metricPrefix, String cacheName){
@@ -86,11 +86,11 @@ public class CacheStatsExtractor extends StatsExtractor {
                 Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
                 JSONObject jsonObject = cache.getJSONObject(str);
                 long responses = jsonObject.getLong("responses");
-                Metric metric = new Metric("Responses", String.valueOf(responses), metricPrefix + cacheName + "|" + config.getAttr() + "|responses", propertiesMap);
+                Metric metric = new Metric("Responses", String.valueOf(responses), metricPrefix + cacheName + METRIC_SEPARATOR + config.getAttr() + "|responses", propertiesMap);
                 cachePerfMetricList.add(metric);
 
                 long bytes = jsonObject.getLong("bytes");
-                metric = new Metric("Bytes", String.valueOf(bytes), metricPrefix + "caches|" + cacheName + "|" + config.getAttr() + "|bytes", propertiesMap);
+                metric = new Metric("Bytes", String.valueOf(bytes), metricPrefix + "caches|" + cacheName + METRIC_SEPARATOR + config.getAttr() + "|bytes", propertiesMap);
                 cachePerfMetricList.add(metric);
             }
         }
@@ -105,16 +105,16 @@ public class CacheStatsExtractor extends StatsExtractor {
                 Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
                 JSONObject jsonObject = cache.getJSONObject(str);
                 long responses = jsonObject.getLong("responses");
-                cacheHitMetricList.add(new Metric("Responses", String.valueOf(responses), metricPrefix + "caches|" + cacheName + "|" + config.getAttr() + "|responses", propertiesMap));
+                cacheHitMetricList.add(new Metric("Responses", String.valueOf(responses), metricPrefix + "caches|" + cacheName + METRIC_SEPARATOR + config.getAttr() + "|responses", propertiesMap));
 
                 long bytes = jsonObject.getLong("bytes");
-                cacheHitMetricList.add(new Metric("Bytes", String.valueOf(bytes), metricPrefix + "caches|" + cacheName + "|" + config.getAttr() + "|bytes", propertiesMap));
+                cacheHitMetricList.add(new Metric("Bytes", String.valueOf(bytes), metricPrefix + "caches|" + cacheName + METRIC_SEPARATOR + config.getAttr() + "|bytes", propertiesMap));
 
                 long responses_written = jsonObject.getLong("responses_written");
-                cacheHitMetricList.add(new Metric("Responses written", String.valueOf(responses_written), metricPrefix + "caches|" + cacheName + "|" + config.getAttr() + "|responses_written", propertiesMap));
+                cacheHitMetricList.add(new Metric("Responses written", String.valueOf(responses_written), metricPrefix + "caches|" + cacheName + METRIC_SEPARATOR + config.getAttr() + "|responses_written", propertiesMap));
 
                 long bytes_written = jsonObject.getLong("bytes_written");
-                cacheHitMetricList.add(new Metric("Bytes written", String.valueOf(bytes_written), metricPrefix + "caches|" + cacheName + "|" + config.getAttr() + "|bytes_written", propertiesMap));
+                cacheHitMetricList.add(new Metric("Bytes written", String.valueOf(bytes_written), metricPrefix + "caches|" + cacheName + METRIC_SEPARATOR + config.getAttr() + "|bytes_written", propertiesMap));
             }
         }
         return cacheHitMetricList;

@@ -12,6 +12,7 @@ import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.appdynamics.monitors.nginx.Config.MetricConfig;
 import com.appdynamics.monitors.nginx.Config.Stat;
+import static com.appdynamics.monitors.nginx.Constant.METRIC_SEPARATOR;
 import com.appdynamics.monitors.nginx.statsExtractor.StatsExtractor;
 import com.appdynamics.monitors.nginx.statsExtractor.StatsFactory;
 import com.google.common.collect.Lists;
@@ -55,7 +56,7 @@ public class JSONResponseParser implements Runnable {
         this.configuration = configuration;
         this.metricWriteHelper = metricWriteHelper;
         this.url = url;
-        this.metricPrefix = metricPrefix + "|" + stat.getSubUrl() + "|";
+        this.metricPrefix = metricPrefix + METRIC_SEPARATOR + stat.getSubUrl() + METRIC_SEPARATOR;
     }
 
 
