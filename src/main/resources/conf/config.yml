@@ -1,18 +1,18 @@
 #prefix used to show up metrics in AppDynamics
 #This will create this metric in all the tiers, under this path
-metricPrefix:  "Custom Metrics|WebServer|NGinX"
+#metricPrefix:  "Custom Metrics|WebServer|NginX Monitor|"
 
 #This will create it in specific Tier. Replace <TIER_ID>
-#metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|NginX Monitor|"
+metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|WebServer|NginX Monitor|"
 
 servers:
-  - displayName: "NGinx Monitor" # mandatory
-    uri: "http://demo.nginx.com/" # append port if needed
+  - displayName: "NGinx Server" # mandatory
+    uri: "http://localhost/nginx_status" # append port if needed
+#    uri: "http://demo.nginx.com/" # append port if needed
     username: ""
     password: ""
     encryptedPassword:
-    nginx_plus: "true"  # true for nginx plus else false
-
+    nginx_plus: "false"  # true for nginx plus else false
 
 encryptionKey: ""
 
@@ -21,6 +21,6 @@ connection:
   socketTimeout: 10000
   connectTimeout: 10000
 
- # For each server you monitor, you will need a total of 8(by default) thread.
- # By default we want to support 5 servers, so it is 5 * 8 = 40 threads.
-numberOfThreads: 16
+ # For each server you monitor, you will need a total of 16(by default) thread.
+ # By default we want to support 5 servers, so it is 5 * 12 = 60 threads.
+numberOfThreads: 12

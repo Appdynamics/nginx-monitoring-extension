@@ -69,8 +69,8 @@ Set delta = true for metric to report per-min data
             <metric attr="backup" alias="BackUp" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="weight" alias="Weight" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
             <metric attr="state" alias="State" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE">
-            <convert str="up" value="0"/>
-            <convert str="down" value="1"/>
+            <convert str="up" value="1"/>
+            <convert str="down" value="0"/>
             <convert str="unavail" value="2"/>
             <convert str="unhealthy" value="3"/>
             </metric>

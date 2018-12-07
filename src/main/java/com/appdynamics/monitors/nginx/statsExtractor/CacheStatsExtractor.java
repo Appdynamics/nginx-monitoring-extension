@@ -40,22 +40,22 @@ public class CacheStatsExtractor extends StatsExtractor {
             for (String cacheName : cacheNames) {
                 JSONObject cache = caches.getJSONObject(cacheName);
                 if (metricConfigMap.containsKey("size")) {
-                    cacheMetrics.add(getLongMetric(metricConfigMap, cache,"size", metricPrefix, cacheName));
+                    cacheMetrics.add(getLongMetric(metricConfigMap, cache, "size", metricPrefix, cacheName));
                 }
                 if (metricConfigMap.containsKey("max_size")) {
-                    cacheMetrics.add(getLongMetric(metricConfigMap, cache,"max_size", metricPrefix, cacheName));
+                    cacheMetrics.add(getLongMetric(metricConfigMap, cache, "max_size", metricPrefix, cacheName));
                 }
                 if (metricConfigMap.containsKey("cold")) {
                     cacheMetrics.add(getBooleanMetric(metricConfigMap, cache, "cold", metricPrefix, cacheName));
                 }
                 String[] cacheAttr = {"hit", "stale", "updating", "revalidated"};
                 List<Metric> cachePerfMetrics = getCachePerfMetrics(metricConfigMap, cache, cacheAttr, metricPrefix, cacheName);
-                if(cachePerfMetrics != null)
+                if (cachePerfMetrics != null)
                     cacheMetrics.addAll(cachePerfMetrics);
 
                 String[] cacheResultAttr = {"miss", "expired", "bypass"};
                 cachePerfMetrics = getCacheHitMetrics(metricConfigMap, cache, cacheResultAttr, metricPrefix, cacheName);
-                if(cachePerfMetrics != null)
+                if (cachePerfMetrics != null)
                     cacheMetrics.addAll(cachePerfMetrics);
             }
         } catch (Exception e) {
@@ -64,21 +64,21 @@ public class CacheStatsExtractor extends StatsExtractor {
         return cacheMetrics;
     }
 
-    private Metric getLongMetric(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String key, String metricPrefix, String cacheName){
+    private Metric getLongMetric(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String key, String metricPrefix, String cacheName) {
         MetricConfig config = metricConfigMap.get(key);
         Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
         long size = cache.getLong(key);
         return new Metric(config.getAlias(), String.valueOf(size), metricPrefix + cacheName + METRIC_SEPARATOR + config.getAttr(), propertiesMap);
     }
 
-    private Metric getBooleanMetric(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String key, String metricPrefix, String cacheName){
+    private Metric getBooleanMetric(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String key, String metricPrefix, String cacheName) {
         MetricConfig config = metricConfigMap.get(key);
         Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
         boolean cold = cache.getBoolean(key);
         return new Metric(config.getAlias(), String.valueOf(cold ? 0 : 1), metricPrefix + cacheName + METRIC_SEPARATOR + config.getAttr(), propertiesMap);
     }
 
-    private List<Metric> getCachePerfMetrics(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String[] cacheAttr, String metricPrefix, String cacheName){
+    private List<Metric> getCachePerfMetrics(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String[] cacheAttr, String metricPrefix, String cacheName) {
         List<Metric> cachePerfMetricList = Lists.newArrayList();
         for (String str : cacheAttr) {
             if (metricConfigMap.containsKey(str)) {
@@ -97,7 +97,7 @@ public class CacheStatsExtractor extends StatsExtractor {
         return cachePerfMetricList;
     }
 
-    private List<Metric> getCacheHitMetrics(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String[] cacheResultAttr, String metricPrefix, String cacheName){
+    private List<Metric> getCacheHitMetrics(Map<String, MetricConfig> metricConfigMap, JSONObject cache, String[] cacheResultAttr, String metricPrefix, String cacheName) {
         List<Metric> cacheHitMetricList = Lists.newArrayList();
         for (String str : cacheResultAttr) {
             if (metricConfigMap.containsKey(str)) {
