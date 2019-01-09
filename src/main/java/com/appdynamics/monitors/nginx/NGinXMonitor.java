@@ -22,6 +22,8 @@ import java.util.Map;
 /**
  * Created by adityajagtiani on 8/31/16.
  */
+
+// #TODO The case of the class name is not proper. Please update it if you feel the same.
 public class NGinXMonitor extends ABaseMonitor {
     public static final Logger logger = Logger.getLogger(NGinXMonitor.class);
     private MonitorContextConfiguration monitorContextConfiguration;
@@ -41,15 +43,12 @@ public class NGinXMonitor extends ABaseMonitor {
     protected void doRun(TasksExecutionServiceProvider tasksExecutionServiceProvider) {
         try {
             List<Map<String, ?>> nginxServers = (List<Map<String, ?>>) configYml.get("servers");
-            AssertUtils.assertNotNull(configYml, "The config.yml is not available");
-            AssertUtils.assertNotNull(this.getContextConfiguration().getMetricsXml(), "Metrics xml not available");
-
+            AssertUtils.assertNotNull(monitorContextConfiguration.getMetricsXml(), "Metrics xml not available");
             for (Map<String, ?> server : nginxServers) {
-                logger.info("Starting the Nginx Monitoring Task for log : " + server.get("displayName"));
-
                 AssertUtils.assertNotNull(server, "the server arguments are empty");
-                NGinXMonitorTask task = new NGinXMonitorTask(monitorContextConfiguration, tasksExecutionServiceProvider.getMetricWriteHelper(), server);
                 AssertUtils.assertNotNull(server.get("displayName"), "The displayName can not be null");
+                logger.info("Starting the Nginx Monitoring Task for server : " + server.get("displayName"));
+                NGinXMonitorTask task = new NGinXMonitorTask(monitorContextConfiguration, tasksExecutionServiceProvider.getMetricWriteHelper(), server);
                 tasksExecutionServiceProvider.submit((String) server.get("displayName"), task);
             }
         } catch (Exception e) {
@@ -59,7 +58,7 @@ public class NGinXMonitor extends ABaseMonitor {
 
     @Override
     protected int getTaskCount() {
-        List<Map<String, ?>> servers = (List<Map<String, ?>>) getContextConfiguration().getConfigYml().get("servers");
+        List<Map<String, ?>> servers = (List<Map<String, ?>>) configYml.get("servers");
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
         return servers.size();
     }
@@ -68,8 +67,9 @@ public class NGinXMonitor extends ABaseMonitor {
     protected void initializeMoreStuff(Map<String, String> args) {
         monitorContextConfiguration = getContextConfiguration();
         configYml = monitorContextConfiguration.getConfigYml();
+        AssertUtils.assertNotNull(configYml, "The config.yml is not available");
         logger.info("initializing metric.xml file");
-        this.getContextConfiguration().setMetricXml(args.get("metric-file"), Stat.Stats.class);
+        monitorContextConfiguration.setMetricXml(args.get("metric-file"), Stat.Stats.class);
     }
 
     public static void main(String[] args) throws TaskExecutionException {

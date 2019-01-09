@@ -36,6 +36,7 @@ public class MetricConfig {
     private String delta;
     @XmlAttribute
     private BigDecimal multiplier;
+    //#TODO The convert filed will not work in the transformers. Please check.
     @XmlElement(name = "convert")
     private MetricConverter[] convert;
 

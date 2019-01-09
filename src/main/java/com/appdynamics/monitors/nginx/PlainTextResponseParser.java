@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 /**
  * Created by adityajagtiani on 10/10/16.
  */
+//#TODO This is just a utility class. There is no state associated with this class. It can be converted as a utility class with static methods.
 public class PlainTextResponseParser {
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -71,6 +72,7 @@ public class PlainTextResponseParser {
     private void addValueToMetricList(String metricValue,  MetricConfig[] metricConfigs,String metricAttr, String metricPrefix, List<Metric> resultList){
         MetricConfig config = getMatchedConfig(metricAttr, metricConfigs);
         if(config != null) {
+            //#TODO The convert value cannot be string. It should be a map. So the propMap signature should be Map<String, ?>.
             Map<String, String> propertiesMap = objectMapper.convertValue(config, Map.class);
             Metric metric = new Metric(metricAttr, metricValue, metricPrefix + metricAttr, propertiesMap);
             resultList.add(metric);

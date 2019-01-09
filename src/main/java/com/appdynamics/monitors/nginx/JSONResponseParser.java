@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-
+// #TODO Please change the name of the class. This is not just parsing response as PlainTextResponseParser class.
 public class JSONResponseParser implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONResponseParser.class);

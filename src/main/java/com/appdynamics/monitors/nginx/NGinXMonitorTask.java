@@ -36,6 +36,8 @@ import java.util.Map;
 /**
  * Created by adityajagtiani on 8/31/16.
  */
+
+// #TODO AMonitorTaskRunnable is a wrapper on top of Runnable.
 public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
 
     public static final Logger logger = Logger.getLogger(NGinXMonitor.class);
@@ -50,7 +52,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
         this.configuration = monitorContextConfiguration;
         this.server = server;
         this.metricWriteHelper = metricWriteHelper;
-        this.metricPrefix = configuration.getMetricPrefix() + METRIC_SEPARATOR + server.get("displayName");
+        this.metricPrefix = configuration.getMetricPrefix() + METRIC_SEPARATOR + this.server.get("displayName");
     }
 
     public void run() {
@@ -61,14 +63,13 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
             logger.info("Completed the Nginx Monitoring task");
         } catch (Exception e) {
             logger.error("Error while running the task " + server.get("displayName") + e);
-        }finally {
+        } finally {
             String prefix = metricPrefix + METRIC_SEPARATOR + "HeartBeat";
             Metric heartBeat = new Metric("HeartBeat", String.valueOf(heartBeatValue), prefix);
             metricList.add(heartBeat);
             metricWriteHelper.transformAndPrintMetrics(metricList);
         }
     }
-
 
     private void populateMetrics(Map<String, String> requestMap, List<Metric> metricList) throws IOException, TaskExecutionException {
         try {
@@ -80,6 +81,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
                 url = url + ((Stat.Stats) configuration.getMetricsXml()).getUrl() + "/";
                 for (Stat stat : stats) {
                     if (stat.getStats() == null) {
+                        //#TODO Please use equals() method here. Better use Strings.isNullOrEmpty()
                         if(stat.getSubUrl() != "") {
                             JSONResponseParser jsonResponseParser = new JSONResponseParser(stat, configuration, metricWriteHelper, metricPrefix, url + stat.getSubUrl());
                             configuration.getContext().getExecutorService().execute("MetricCollector", jsonResponseParser);
@@ -163,7 +165,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
         String password = (String) server.get(Constant.PASSWORD);
         String encryptedPassword = (String) server.get(Constant.ENCRYPTED_PASSWORD);
         Map<String, ?> configMap = configuration.getConfigYml();
-        String encryptionKey = configMap.get(Constant.ENCRYPTION_KEY).toString();
+        String encryptionKey = (String)configMap.get(Constant.ENCRYPTION_KEY);
         if(!Strings.isNullOrEmpty(password)){
             return password;
         }
@@ -171,11 +173,12 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
             Map<String,String> cryptoMap = Maps.newHashMap();
             cryptoMap.put("encryptedPassword", encryptedPassword);
             cryptoMap.put("encryptionKey", encryptionKey);
-            logger.debug("Decrypting the ecncrypted password........");
+            logger.debug("Decrypting the encrypted password........");
+            //#TODO There can be some corner cases you are missing here. Please check the getPassword() method in CryptoUtil. Think of ordan empty password
+            //#and non-empty encryptedPassword, encryptionKey case.
             return CryptoUtil.getPassword(cryptoMap);
         }
         return "";
     }
-
 }
 

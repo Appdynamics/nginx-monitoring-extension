@@ -11,6 +11,7 @@ public class Constant {
     public static String MonitorName;
 
     static {
+        // #TODO Please change the case of "Nginx" if you change the name of the monitor.
         METRIC_PREFIX = "Custom Metrics|NGinX";
         MonitorName = "Nginx Monitor";
         URI = "uri";
@@ -19,6 +20,5 @@ public class Constant {
         ENCRYPTION_KEY = "encryptionKey";
         PASSWORD = "password";
         METRIC_SEPARATOR = "|";
-
     }
 }

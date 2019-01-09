@@ -1,8 +1,11 @@
+#TODO Please update the comment blocks for metricPrefix. Please check AWS redshift extension.
 #prefix used to show up metrics in AppDynamics
 #This will create this metric in all the tiers, under this path
+# TODO Why is there a WebServer in the metricPrefix? Can you please reomove it? Also if please check the case of "Nginx"
 metricPrefix:  "Custom Metrics|WebServer|NGinX"
 
 #This will create it in specific Tier. Replace <TIER_ID>
+# TODO please check the case of "Nginx".
 #metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|NginX Monitor|"
 
 servers:
@@ -13,7 +16,6 @@ servers:
     encryptedPassword:
     nginx_plus: "true"  # true for nginx plus else false
 
-
 encryptionKey: ""
 
 connection:
@@ -21,6 +23,7 @@ connection:
   socketTimeout: 10000
   connectTimeout: 10000
 
- # For each server you monitor, you will need a total of 8(by default) thread.
- # By default we want to support 5 servers, so it is 5 * 8 = 40 threads.
-numberOfThreads: 16
+#TODO The number of threads required does not look 8 with the default config.yml. It could e 11. Please reverify.
+# For each server you monitor, you will need a total of 8(by default) threads.
+# By default we want to support 5 servers, so it is 5 * 8 = 40 threads.
+numberOfThreads: 40
