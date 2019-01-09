@@ -36,16 +36,14 @@ import java.util.Map;
 /**
  * Created by adityajagtiani on 8/31/16.
  */
-
-// #TODO AMonitorTaskRunnable is a wrapper on top of Runnable.
-public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
+public class NGinXMonitorTask implements AMonitorTaskRunnable {
 
     public static final Logger logger = Logger.getLogger(NGinXMonitor.class);
     private static final String METRIC_SEPARATOR = Constant.METRIC_SEPARATOR;
     private Map server;
     private MonitorContextConfiguration configuration;
     private MetricWriteHelper metricWriteHelper;
-    private String metricPrefix;
+    private String metricPrefix = "Custom Metrics|WebServer|NGinX|";
     private BigInteger heartBeatValue = BigInteger.ZERO;
 
     public NGinXMonitorTask(MonitorContextConfiguration monitorContextConfiguration, MetricWriteHelper metricWriteHelper, Map server) {
@@ -75,8 +73,10 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
         try {
             String url = UrlBuilder.builder(requestMap).build();
             if (server.get("nginx_plus").equals("false")) {
+                logger.debug("nginx_plus is false");
                 metricList.addAll(populatePlainTextMetrics(url));
             } else {
+                logger.debug("nginx_plus is true");
                 Stat[] stats = ((Stat.Stats) configuration.getMetricsXml()).getStats();
                 url = url + ((Stat.Stats) configuration.getMetricsXml()).getUrl() + "/";
                 for (Stat stat : stats) {
@@ -113,6 +113,7 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity, "UTF-8");
             AssertUtils.assertNotNull(responseBody, "response of the request is empty");
+            logger.debug("response collected for text/plain: " + responseBody);
             String header = response.getFirstHeader("Content-Type").getValue();
             if (header != null && header.contains("text/plain")) {
                 MetricConfig[] metricConfigs = getPlainTestConfigs(((Stat.Stats) configuration.getMetricsXml()).getStats());
@@ -134,11 +135,6 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
         }
     }
 
-    @Override
-    public void onTaskComplete() {
-        logger.info("Completed the Nginx Monitoring task for log : " + server.get("displayName"));
-    }
-
     private MetricConfig[] getPlainTestConfigs(Stat[] stats){
         for(Stat stat : stats){
             if(stat.getName().equals("plain-text"))
@@ -148,11 +144,11 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
     }
 
     /*
-     * Builds a hashMap of the nginx server from the read config file.
-     *
+     * Builds a Map of the nginx server from the read config file.
      * @param haServer
      * @return
      */
+
     private Map<String, String> buildRequestMap() {
         Map<String, String> requestMap = new HashMap<String, String>();
         requestMap.put(Constant.URI, (String) server.get(Constant.URI));
@@ -160,7 +156,6 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
         requestMap.put(Constant.PASSWORD, getPassword());
         return requestMap;
     }
-
     private String getPassword(){
         String password = (String) server.get(Constant.PASSWORD);
         String encryptedPassword = (String) server.get(Constant.ENCRYPTED_PASSWORD);
@@ -179,6 +174,10 @@ public class NGinXMonitorTask implements Runnable, AMonitorTaskRunnable {
             return CryptoUtil.getPassword(cryptoMap);
         }
         return "";
+    }
+    @Override
+    public void onTaskComplete() {
+        logger.info("Completed the Nginx Monitoring task for log : " + server.get("displayName"));
     }
 }
 

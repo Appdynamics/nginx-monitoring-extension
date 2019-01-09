@@ -1,27 +1,26 @@
-# AppDynamics Nginx - Monitoring Extension
-
-This extension works only with the java standalone machine agent.
+# AppDynamics Nginx Monitoring Extension
 
 ## Use Case
+Nginx is a web server which can also be used as a reverse proxy, load balancer, mail proxy and HTTP cache. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser. This extension supports both NGinx and NGinx Plus.
 
-Nginx is an open-source HTTP server and reverse proxy, and an IMAP/POP3 proxy server. The Nginx monitoring extension gets metrics from the nginx server and displays them in the AppDynamics Metric Browser. This extension supports both NGinx and NGinx Plus.
+## Prerequisites
 
-Metrics include:
-* Active connections
-* Total number of requests
-* Accepted and handled requests
-* Reading, writing, and waiting
+In order to use this extension, you do need a [Standalone JAVA Machine Agent](https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents) or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).  For more details on downloading these products, please  visit [here](https://download.appdynamics.com/).
+The extension needs to be able to connect to the Nginx in order to collect and send metrics. To do this, you will have to either establish a remote connection in between the extension and the product, or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
 
 
 ## Installation
 
-**Note**: For the following steps to work, nginx should be running with <a href="http://nginx.org/en/docs/http/ngx_http_stub_status_module.html">&quot;ngx_http_stub_status_module&quot;</a> or <a href="http://nginx.org/en/docs/http/ngx_http_status_module.html">&quot;ngx_http_status_module&quot;</a> enabled. Please make sure you have required changes in the nginx.conf.
+**Note**: For the following steps to work, nginx should be running with <a href="http://nginx.org/en/docs/http/ngx_http_stub_status_module.html">&quot;ngx_http_stub_status_module&quot;</a> or <a href="http://nginx.org/en/docs/http/ngx_http_api_module.html">&quot;ngx_http_api_module&quot;</a> enabled. Please make sure you have required changes in the nginx.conf.
 
-1. Type 'mvn clean install' in the command line from the nginx-monitoring-extension directory
-2. Deploy the file NginxMonitor.zip found in the 'target' directory into \<machineagent install dir\>/monitors/
-3. Unzip the deployed file
-4. Restart the machineagent
-5. In the AppDynamics Metric Browser, look for: Application Infrastructure Performance  | \<Tier\> | Custom Metrics | WebServer | NGinX.
+
+1. Download and unzip the nginx-monitoring-extension-2.0.0.zip to the "<MachineAgent_Dir>/monitors" directory.
+2. Edit the file config.yml as described below in Configuration Section, located in <MachineAgent_Dir>/monitors/NGinXMonitor and update the server(s) details.
+3. All metrics to be reported are configured in metrics.xml. Users can remove entries from metrics.xml to stop the metric from reporting, or add new entries as well.
+4. Restart the Machine Agent.
+
+Please place the extension in the **"monitors"** directory of your **Machine Agent** installation directory. Do not place the extension in the **"extensions"** directory of your **Machine Agent** installation directory.
+In the AppDynamics Metric Browser, look for **Application Infrastructure Performance|\<Tier\>|Custom Metrics|NginX Monitor** and you should be able to see all the metrics.
 
 
 ## Directory Structure
@@ -50,7 +49,86 @@ Metrics include:
 </tbody>
 </table>
 
+## Configuration
+### Config.yml
+
+Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/NginxMonitor/`.
+  1. Configure the "COMPONENT_ID" under which the metrics need to be reported. This can be done by changing the value of `<COMPONENT_ID>` in   **metricPrefix: Server|Component:<TIER_ID>|Custom Metrics|NginX Monitor|**.
+       For example,
+       ```
+        metricPrefix:  "Server|Component:100>|Custom Metrics|WebServer|NginX Monitor|"
+       ```
+
+  2. The extension supports reporting metrics from multiple Nginx instances. The monitor provides an option to add Nginx server/s for monitoring the metrics provided by the particular end-point. Have a look at config.yml for more details.
+      For example:
+      ```
+        metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|WebServer|NginX Monitor|"
+
+		servers:
+		  - displayName: "NGinx Monitor" # mandatory
+		    uri: "http://localhost/nginx_status" # append port if needed
+		    username: ""
+		    password: ""
+		    encryptedPassword:
+		    nginx_plus: "false"  # true for nginx plus else false
+
+		encryptionKey: ""
+
+		connection:
+		  sslCertCheckEnabled: false
+		  socketTimeout: 10000
+		  connectTimeout: 10000
+
+		 # For each server you monitor, you will need a total of 8(by default) thread.
+		 # By default we want to support 5 servers, so it is 5 * 8 = 40 threads.
+		numberOfThreads: 12
+      ```
+  3. If you want to monitor [nginx plus](https://www.nginx.com/products/nginx/) then put nginx_plus as true and make sure [ngx_http_api_module](http://nginx.org/en/docs/http/ngx_http_api_module.html) is configured.
+        ```
+             nginx_plus: "true"  # true for nginx plus else false
+        ```
+  4. Configure the numberOfThreads.
+     For example,
+     If number of servers that need to be monitored is 5, then number of threads required is 5 * 12 = 60
+     ```
+     numberOfThreads: 60
+     ```
+
+### Metrics.xml
+You can add/remove metrics of your choice by modifying the provided metrics.xml file. This file consists of all the metrics that will be monitored and sent to the controller. Please look how the metrics have been defined and follow the same convention, when adding new metrics. You do have the ability to chosoe your Rollup types as well as set an alias that you would like to be displayed on the metric browser.
+
+   1. Stats Configuration
+    Add the stats `url` which has api version(1/2/3) information as shown below.
+        ```
+		<stats url="/api/3">
+        ```
+
+   2. Metric Stat Configuration
+    Add the `metric` to be monitored under the metric tag as shown below.
+        ```
+	    <stat suburl="processes" name="Processes-Status">
+	        <metric attr="respawned" alias="Respawned" aggregationType = "AVERAGE" timeRollUpType = "AVERAGE" clusterRollUpType = "COLLECTIVE"/>
+	    </stat>
+        ```
+For configuring the metrics, the following properties can be used:
+
+ |     Property      |   Default value |         Possible values         |                                               Description                                                      |
+ | ----------------- | --------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+ | alias             | metric name     | Any string                      | The substitute name to be used in the metric browser instead of metric name.                                   |
+ | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)    |
+ | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)   |
+ | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)|
+ | multiplier        | 1               | Any number                      | Value with which the metric needs to be multiplied.                                                            |
+ | convert           | null            | Any key value map               | Set of key value pairs that indicates the value to which the metrics need to be transformed. eg: UP:1, OPEN:1  |
+ | delta             | false           | true, false                     | If enabled, gives the delta values of metrics instead of actual values.                                        |
+
+
+ **All these metric properties are optional, and the default value shown in the table is applied to the metric (if a property has not been specified) by default.**
+
+
+
 ## Metrics
+Nginx Monitoring Extension can collect metric by hitting the available [Endpoints](http://nginx.org/en/docs/http/ngx_http_api_module.html) which are configured in the metrics.xml.
 
 ### NGinx Metrics
 
@@ -63,7 +141,7 @@ Metrics include:
 | Reading | Nginx reads request header  |
 | Writing | Nginx reads request body, processes request, or writes response to a client  |
 | Waiting | NGinX keep-alive connections or currently active |
-  
+
 ### NGinx Plus Metrics
 
 #### Requests
@@ -80,6 +158,7 @@ Metrics include:
 | requests | The total number of client requests received from clients |
 | responses/total | The total number of responses sent to clients |
 | responses/ 1xx, 2xx, 3xx, 4xx, 5xx  | The number of responses with status codes 1xx, 2xx, 3xx, 4xx, and 5xx |
+| discarded | The total number of bytes discarded from clients  |
 | received | The total number of bytes received from clients  |
 | sent | The total number of bytes sent to clients |
 
@@ -89,10 +168,8 @@ Metrics include:
 | --- | --- |
 | active | The current number of active connections |
 | backup | A boolean value indicating whether the server is a backup server |
-| downstart | The time (in milliseconds since Epoch) when the server became “unavail” or “unhealthy”  |
 | downtime  | Total time the server was in the “unavail” and “unhealthy” states |
 | fails | The total number of unsuccessful attempts to communicate with the server |
-| keepalive | The current number of idle keepalive connections |
 | received | The total number of bytes received from this server |
 | requests | The total number of client requests forwarded to this server |
 | sent | The total number of bytes sent to this server |
@@ -129,18 +206,41 @@ Metrics include:
 | miss, expired, bypass/responses_written | The total number of responses written to the cache |
 | miss, expired, bypass/bytes_written | The total number of bytes written to the cache |
 
-## Custom Dashboard
+## Credentials Encryption
 
-![](https://raw.github.com/Appdynamics/nginx-monitoring-extension/master/nginx_custom.png)
+Please visit [this page](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-Password-Encryption-with-Extensions/ta-p/29397) to get detailed instructions on password encryption. The steps in this document will guide you through the whole process.
+
+## Extensions Workbench
+Workbench is an inbuilt feature provided with each extension in order to assist you to fine tune the extension setup before you actually deploy it on the controller. Please review the following document on [How to use the Extensions WorkBench](https://community.appdynamics.com/t5/Knowledge-Base/How-to-use-the-Extensions-WorkBench/ta-p/30130).
+
+## Troubleshooting
+Please follow the steps listed in this [troubleshooting-document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) in order to troubleshoot your issue. These are a set of common issues that customers might have faced during the installation of the extension. If these don't solve your issue, please follow the last step on the [troubleshooting-document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) to contact the support team.
+
+
+## Support Tickets
+If after going through the [Troubleshooting Document](https://community.appdynamics.com/t5/Knowledge-Base/How-to-troubleshoot-missing-custom-metrics-or-extensions-metrics/ta-p/28695) you have not been able to get your extension working, please file a ticket and add the following information.
+
+Please provide the following in order for us to assist you better.
+
+    1. Stop the running machine agent.
+    2. Delete all existing logs under <MachineAgent>/logs.
+    3. Please enable debug logging by editing the file <MachineAgent>/conf/logging/log4j.xml. Change the level value of the following <logger> elements to debug.
+        <logger name="com.singularity">
+        <logger name="com.appdynamics">
+    4. Start the machine agent and please let it run for 10 mins. Then zip and upload all the logs in the directory <MachineAgent>/logs/*.
+    5. Attach the zipped <MachineAgent>/conf/* directory here.
+    6. Attach the zipped <MachineAgent>/monitors/ExtensionFolderYouAreHavingIssuesWith directory here.
+
+For any support related questions, you can also contact help@appdynamics.com.
 
 ## Contributing
+Always feel free to fork and contribute any changes directly here on [GitHub](https://github.com/Appdynamics/nginx-monitoring-extension).
 
-Always feel free to fork and contribute any changes directly via [GitHub](https://github.com/Appdynamics/nginx-monitoring-extension).
-
-## Community
-
-Find out more in the [AppSphere](http://appsphere.appdynamics.com/t5/Extensions/Nginx-Monitoring-Extension/idi-p/895) community.
-
-## Support
-
-For any questions or feature request, please contact [AppDynamics Center of Excellence](mailto:help@appdynamics.com).
+## Version
+|          Name            |  Version   |
+|--------------------------|------------|
+|Extension Version         |2.0.0       |
+|Controller Compatibility  |3.7 or Later|
+|Product Tested On         |1.13.3     |
+|Last Update               |07/12/2018  |
+|Changes list              |[ChangeLog](https://github.com/Appdynamics/nginx-monitoring-extension/blob/master/CHANGELOG.md)|

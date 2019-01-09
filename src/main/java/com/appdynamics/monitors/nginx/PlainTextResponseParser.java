@@ -10,6 +10,7 @@ package com.appdynamics.monitors.nginx;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.monitors.nginx.Config.MetricConfig;
 import com.google.common.collect.Lists;
+import org.apache.log4j.Logger;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.BufferedReader;
@@ -25,39 +26,45 @@ import java.util.regex.Pattern;
  */
 //#TODO This is just a utility class. There is no state associated with this class. It can be converted as a utility class with static methods.
 public class PlainTextResponseParser {
-    ObjectMapper objectMapper = new ObjectMapper();
+    public static final Logger logger = Logger.getLogger(PlainTextResponseParser.class);
+
+    private ObjectMapper objectMapper = new ObjectMapper();
 
     public List<Metric> parseResponse(String responseBody, MetricConfig[] metricConfigs, String metricPrefix) throws IOException {
         List<Metric> resultList = Lists.newArrayList();
         Pattern numPattern = Pattern.compile("\\d+");
         BufferedReader reader = new BufferedReader(new StringReader(responseBody));
-        String line, whiteSpaceRegex = "\\s";
+        String line = "", whiteSpaceRegex = "\\s";
         String currAttr;
-        while ((line = reader.readLine()) != null) {
-            currAttr = "Active connections";
-            if (line.contains(currAttr)) {
-                Matcher numMatcher = numPattern.matcher(line);
-                if (numMatcher.find()) {
-                    addValueToMetricList(numMatcher.group(),  metricConfigs, currAttr, metricPrefix, resultList);
+        try {
+            while ((line = reader.readLine()) != null) {
+                currAttr = "Active connections";
+                if (line.contains(currAttr)) {
+                    Matcher numMatcher = numPattern.matcher(line);
+                    if (numMatcher.find()) {
+                        addValueToMetricList(numMatcher.group(), metricConfigs, currAttr, metricPrefix, resultList);
+                    }
+                } else if (line.contains("server")) {
+                    line = reader.readLine();
+                    String[] results = line.trim().split(whiteSpaceRegex);
+                    currAttr = "Server|Accepts";
+                    addValueToMetricList(results[0], metricConfigs, currAttr, metricPrefix, resultList);
+                    currAttr = "Server|Handled";
+                    addValueToMetricList(results[1], metricConfigs, currAttr, metricPrefix, resultList);
+                    currAttr = "Server|Requests";
+                    addValueToMetricList(results[2], metricConfigs, currAttr, metricPrefix, resultList);
+                } else if (line.contains("Reading")) {
+                    String[] results = line.trim().split(whiteSpaceRegex);
+                    currAttr = "Reading";
+                    addValueToMetricList(results[1], metricConfigs, currAttr, metricPrefix, resultList);
+                    currAttr = "Writing";
+                    addValueToMetricList(results[3], metricConfigs, currAttr, metricPrefix, resultList);
+                    currAttr = "Waiting";
+                    addValueToMetricList(results[5], metricConfigs, currAttr, metricPrefix, resultList);
                 }
-            } else if (line.contains("server")) {
-                line = reader.readLine();
-                String[] results = line.trim().split(whiteSpaceRegex);
-                currAttr = "Server|Accepts";
-                addValueToMetricList(results[0],  metricConfigs, currAttr, metricPrefix, resultList);
-                currAttr = "Server|Handled";
-                addValueToMetricList(results[1],  metricConfigs, currAttr, metricPrefix, resultList);
-                currAttr = "Server|Requests";
-                addValueToMetricList(results[2],  metricConfigs, currAttr, metricPrefix, resultList);
-            } else if (line.contains("Reading")) {
-                String[] results = line.trim().split(whiteSpaceRegex);
-                currAttr = "Reading";
-                addValueToMetricList(results[1],  metricConfigs, currAttr, metricPrefix, resultList);
-                currAttr = "Writing";
-                addValueToMetricList(results[3],  metricConfigs, currAttr, metricPrefix, resultList);
-                currAttr = "Waiting";
-                addValueToMetricList(results[5],  metricConfigs, currAttr, metricPrefix, resultList);
             }
+        }catch (Exception e){
+            logger.error("error is parsing plain text", e);
         }
         return resultList;
     }

@@ -13,7 +13,6 @@ import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.appdynamics.monitors.nginx.Config.Stat;
 import com.google.common.collect.Maps;
-import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.apache.log4j.Logger;
 
 import java.util.List;
@@ -72,8 +71,8 @@ public class NGinXMonitor extends ABaseMonitor {
         monitorContextConfiguration.setMetricXml(args.get("metric-file"), Stat.Stats.class);
     }
 
-    public static void main(String[] args) throws TaskExecutionException {
-
+//    public static void main(String[] args) throws TaskExecutionException {
+//
 //        ConsoleAppender ca = new ConsoleAppender();
 //        ca.setWriter(new OutputStreamWriter(System.out));
 //        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
@@ -86,6 +85,6 @@ public class NGinXMonitor extends ABaseMonitor {
 //        taskArgs.put("metric-file", "src/main/resources/conf/metrics.xml");
 //
 //        monitor.execute(taskArgs, null);
-
-    }
+//
+//    }
 }

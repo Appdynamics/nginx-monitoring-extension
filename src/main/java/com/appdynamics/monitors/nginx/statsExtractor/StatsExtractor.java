@@ -32,13 +32,15 @@ import java.util.Map;
 
 public abstract class StatsExtractor {
 
-    public  static final Logger logger = LoggerFactory.getLogger(StatsExtractor.class);
+    public static final Logger logger = LoggerFactory.getLogger(StatsExtractor.class);
+
     public abstract List<Metric> extractStats(JSONObject respJson, Stat stat, String metricPrefix);
+
     public static final String METRIC_SEPARATOR = Constant.METRIC_SEPARATOR;
 
-    public Map<String, MetricConfig> getmetricConfigMap(MetricConfig[] metricConfigs){
+    public Map<String, MetricConfig> getmetricConfigMap(MetricConfig[] metricConfigs) {
         Map<String, MetricConfig> configMap = new HashMap<>();
-        for(MetricConfig config : metricConfigs) {
+        for (MetricConfig config : metricConfigs) {
             configMap.put(config.getAttr(), config);
         }
         return configMap;

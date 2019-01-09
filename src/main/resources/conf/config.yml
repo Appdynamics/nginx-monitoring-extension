@@ -1,20 +1,21 @@
 #TODO Please update the comment blocks for metricPrefix. Please check AWS redshift extension.
 #prefix used to show up metrics in AppDynamics
 #This will create this metric in all the tiers, under this path
-# TODO Why is there a WebServer in the metricPrefix? Can you please reomove it? Also if please check the case of "Nginx"
-metricPrefix:  "Custom Metrics|WebServer|NGinX"
+#metricPrefix:  "Custom Metrics|WebServer|NginX Monitor|"
 
 #This will create it in specific Tier. Replace <TIER_ID>
+# TODO Why is there a WebServer in the metricPrefix? Can you please reomove it? Also if please check the case of "Nginx"
 # TODO please check the case of "Nginx".
-#metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|NginX Monitor|"
+metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|WebServer|NginX Monitor|"
 
 servers:
-  - displayName: "NGinx Monitor" # mandatory
-    uri: "http://demo.nginx.com/" # append port if needed
+  - displayName: "NGinx Server" # mandatory
+    uri: "http://localhost/nginx_status" # append port if needed
+#    uri: "http://demo.nginx.com/" # append port if needed
     username: ""
     password: ""
     encryptedPassword:
-    nginx_plus: "true"  # true for nginx plus else false
+    nginx_plus: "false"  # true for nginx plus else false
 
 encryptionKey: ""
 
@@ -23,7 +24,8 @@ connection:
   socketTimeout: 10000
   connectTimeout: 10000
 
-#TODO The number of threads required does not look 8 with the default config.yml. It could e 11. Please reverify.
-# For each server you monitor, you will need a total of 8(by default) threads.
-# By default we want to support 5 servers, so it is 5 * 8 = 40 threads.
-numberOfThreads: 40
+#TODO The number of threads needs to be updated to 60.
+ # For each server you monitor, you will need a total of 16(by default) thread.
+ # By default we want to support 5 servers, so it is 5 * 12 = 60 threads.
+numberOfThreads: 12
+
