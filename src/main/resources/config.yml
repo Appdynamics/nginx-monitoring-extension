@@ -8,12 +8,12 @@ metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Nginx|"
 
 servers:
   - displayName: "Nginx Server" # mandatory
-#    uri: "http://localhost/nginx_status" # append port if needed
-    uri: "http://demo.nginx.com/" # append port if needed
+    uri: "http://localhost/nginx_status" # append port if needed
+#    uri: "http://demo.nginx.com/" # append port if needed
     username: ""
     password: ""
     encryptedPassword:
-    nginx_plus: "true"  # true for nginx plus else false
+    nginx_plus: "false"  # true for nginx-plus else false
 
 encryptionKey: ""
 

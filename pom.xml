@@ -13,7 +13,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss</maven.build.timestamp.format>
         <target.dir>${project.build.directory}/${project.name}</target.dir>
-        <target.name>NGinXMonitor</target.name>
+        <target.name>NginxMonitor</target.name>
     </properties>
     <dependencies>
         <dependency>
@@ -33,11 +33,6 @@
             <version>1.2.17</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.5</version>
-        </dependency>
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20140107</version>
@@ -46,18 +41,6 @@
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
             <version>1.6.3</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>1.10.19</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.powermock</groupId>
-            <artifactId>powermock-api-mockito-common</artifactId>
-            <version>1.6.5</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -70,12 +53,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.5</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
@@ -115,14 +92,11 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Implementation-Title>NGinx Monitor v${project.version} Build Date
-                                            ${maven.build.timestamp}
-                                        </Implementation-Title>
+                                        <Implementation-Title>Nginx Monitor v${project.version} Build Date ${maven.build.timestamp} </Implementation-Title>
+                                        <Main-Class>com.appdynamics.extensions.workbench.WorkbenchServerLauncher</Main-Class>
                                     </manifestEntries>
                                 </transformer>
                             </transformers>
@@ -137,8 +111,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Implementation-Title>NGinXMonitor v${project.version} Build Date ${maven.build.timestamp}
-                            </Implementation-Title>
+                            <Implementation-Title>NginxMonitor v${project.version} Build Date ${maven.build.timestamp}</Implementation-Title>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -153,12 +126,12 @@
                         <phase>install</phase>
                         <configuration>
                             <target>
-                                <property name="target.dir" value="${project.build.directory}/NGinXMonitor"/>
+                                <property name="target.dir" value="${project.build.directory}/NginxMonitor"/>
                                 <mkdir dir="${target.dir}"/>
                                 <copy todir="${target.dir}">
-                                    <fileset dir="src/main/resources/conf" includes="monitor.xml"/>
-                                    <fileset dir="src/main/resources/conf" includes="config.yml" />
-                                    <fileset dir="src/main/resources/conf" includes="metrics.xml" />
+                                    <fileset dir="src/main/resources" includes="monitor.xml"/>
+                                    <fileset dir="src/main/resources" includes="config.yml" />
+                                    <fileset dir="src/main/resources" includes="metrics.xml" />
 
                                 </copy>
                                 <copy todir="${target.dir}">
@@ -172,7 +145,7 @@
                                     <fileset dir="${project.basedir}" includes="NOTICE.txt"/>
                                 </copy>
                                 <zip destfile="${target.dir}-${project.version}.zip">
-                                    <zipfileset dir="${target.dir}" filemode="755" prefix="NGinXMonitor"/>
+                                    <zipfileset dir="${target.dir}" filemode="755" prefix="NginxMonitor"/>
                                 </zip>
                                 <delete dir="${target.dir}"/>
                             </target>
