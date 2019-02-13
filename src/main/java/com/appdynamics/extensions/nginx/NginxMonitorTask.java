@@ -1,8 +1,9 @@
 /*
- * Copyright 2013. AppDynamics LLC and its affiliates.
- *  All Rights Reserved.
- *  This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
- *  The copyright notice above does not evidence any actual or intended publication of such source code.
+ * Copyright 2018. AppDynamics LLC and its affiliates.
+ * All Rights Reserved.
+ * This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
+ * The copyright notice above does not evidence any actual or intended publication of such source code.
+ *
  */
 
 package com.appdynamics.extensions.nginx;
@@ -162,7 +163,7 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
         if (!Strings.isNullOrEmpty(password)) {
             return password;
         }
-        if (!Strings.isNullOrEmpty(encryptedPassword) && !Strings.isNullOrEmpty(encryptionKey)) {
+        if (!Strings.isNullOrEmpty(encryptedPassword)) {
             Map<String, String> cryptoMap = Maps.newHashMap();
             cryptoMap.put("encryptedPassword", encryptedPassword);
             cryptoMap.put("encryptionKey", encryptionKey);

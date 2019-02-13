@@ -15,7 +15,7 @@ The extension needs to be able to connect to the Nginx in order to collect and s
 
 
 1. Download and unzip the nginx-monitoring-extension-2.0.0.zip to the "<MachineAgent_Dir>/monitors" directory.
-2. Edit the file config.yml as described below in Configuration Section, located in <MachineAgent_Dir>/monitors/NGinXMonitor and update the server(s) details.
+2. Edit the file config.yml as described below in Configuration Section, located in <MachineAgent_Dir>/monitors/NginxMonitor and update the server(s) details.
 3. All metrics to be reported are configured in metrics.xml. Users can remove entries from metrics.xml to stop the metric from reporting, or add new entries as well.
 4. Restart the Machine Agent.
 
@@ -53,19 +53,19 @@ In the AppDynamics Metric Browser, look for **Application Infrastructure Perform
 ### Config.yml
 
 Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/monitors/NginxMonitor/`.
-  1. Configure the "COMPONENT_ID" under which the metrics need to be reported. This can be done by changing the value of `<COMPONENT_ID>` in   **metricPrefix: Server|Component:<TIER_ID>|Custom Metrics|NginX Monitor|**.
+  1. Configure the "COMPONENT_ID" under which the metrics need to be reported. This can be done by changing the value of `<COMPONENT_ID>` in   **metricPrefix: Server|Component:<TIER_ID>|Custom Metrics|Nginx|**.
        For example,
        ```
-        metricPrefix:  "Server|Component:100>|Custom Metrics|WebServer|NginX Monitor|"
+        metricPrefix:  "Server|Component:100>|Custom Metrics|Nginx|"
        ```
 
   2. The extension supports reporting metrics from multiple Nginx instances. The monitor provides an option to add Nginx server/s for monitoring the metrics provided by the particular end-point. Have a look at config.yml for more details.
       For example:
       ```
-        metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|WebServer|NginX Monitor|"
+        metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Nginx|"
 
 		servers:
-		  - displayName: "NGinx Monitor" # mandatory
+		  - displayName: "Nginx Server" # mandatory
 		    uri: "http://localhost/nginx_status" # append port if needed
 		    username: ""
 		    password: ""
@@ -130,7 +130,7 @@ For configuring the metrics, the following properties can be used:
 ## Metrics
 Nginx Monitoring Extension can collect metric by hitting the available [Endpoints](http://nginx.org/en/docs/http/ngx_http_api_module.html) which are configured in the metrics.xml.
 
-### NGinx Metrics
+### Nginx Metrics
 
 | Metric Name | Description |
 | --- | --- |
@@ -140,9 +140,9 @@ Nginx Monitoring Extension can collect metric by hitting the available [Endpoint
 | Server: Requests | Total number of requests  |
 | Reading | Nginx reads request header  |
 | Writing | Nginx reads request body, processes request, or writes response to a client  |
-| Waiting | NGinX keep-alive connections or currently active |
+| Waiting | NginX keep-alive connections or currently active |
 
-### NGinx Plus Metrics
+### Nginx Plus Metrics
 
 #### Requests
 
@@ -237,10 +237,10 @@ For any support related questions, you can also contact help@appdynamics.com.
 Always feel free to fork and contribute any changes directly here on [GitHub](https://github.com/Appdynamics/nginx-monitoring-extension).
 
 ## Version
-|          Name            |  Version   |
-|--------------------------|------------|
-|Extension Version         |2.0.0       |
-|Controller Compatibility  |3.7 or Later|
-|Product Tested On         |1.13.3     |
-|Last Update               |07/12/2018  |
+|          Name            |  Version          |
+|--------------------------|-------------------|
+|Extension Version         |2.0.0              |
+|Controller Compatibility  |3.7 or Later       |
+|Product Tested On         |1.13.3 and later   |
+|Last Update               |12/02/2019         |
 |Changes list              |[ChangeLog](https://github.com/Appdynamics/nginx-monitoring-extension/blob/master/CHANGELOG.md)|
