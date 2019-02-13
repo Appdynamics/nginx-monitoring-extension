@@ -1,32 +1,33 @@
 <!--
-  ~ Copyright 2013. AppDynamics LLC and its affiliates.
+  ~ Copyright 2018. AppDynamics LLC and its affiliates.
   ~  All Rights Reserved.
   ~  This is unpublished proprietary source code of AppDynamics LLC and its affiliates.
   ~  The copyright notice above does not evidence any actual or intended publication of such source code.
   -->
 
 <monitor>
-    <name>NGinXMonitor</name>
+    <name>NginxMonitor</name>
     <type>managed</type>
-    <description>NGinX server monitor</description>
+    <description>Nginx server monitor</description>
     <monitor-configuration></monitor-configuration>
     <monitor-run-task>
         <execution-style>periodic</execution-style>
         <execution-frequency-in-seconds>60</execution-frequency-in-seconds>
-        <name>NGinX Monitor Run Task</name>
-        <display-name>NGinX Monitor Task</display-name>
-        <description>NGinX Monitor Task</description>
+        <name>Nginx Monitor Run Task</name>
+        <display-name>Nginx Monitor Task</display-name>
+        <description>Nginx Monitor Task</description>
         <type>java</type>
         <execution-timeout-in-secs>60</execution-timeout-in-secs>
         <task-arguments>
-            <argument name="config-file" is-required="true" default-value="monitors/NGinXMonitor/config.yaml" />
+            <argument name="config-file" is-required="true" default-value="monitors/NginxMonitor/config.yml" />
+            <argument name="metric-file" is-required="true" default-value="monitors/NginxMonitor/metrics.xml" />
             <!-- Optional Properties  -->
             <!--<argument name="metric-prefix" is-required="false" default-value="Custom Metrics|WebServer|NGinX"/>-->
 
         </task-arguments>
         <java-task>
             <classpath>nginx-monitoring-extension.jar</classpath>
-            <impl-class>com.appdynamics.monitors.nginx.NGinXMonitor</impl-class>
+            <impl-class>com.appdynamics.extensions.nginx.NginxMonitor</impl-class>
         </java-task>
     </monitor-run-task>
 </monitor>
