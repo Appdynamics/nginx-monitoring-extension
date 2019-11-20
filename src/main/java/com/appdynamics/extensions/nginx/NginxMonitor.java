@@ -11,14 +11,15 @@ package com.appdynamics.extensions.nginx;
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.nginx.Config.Stat;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Maps;
 import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
+import org.slf4j.Logger;
 
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 
 public class NginxMonitor extends ABaseMonitor {
-    public static final Logger logger = Logger.getLogger(NginxMonitor.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(NginxMonitor.class);
     private MonitorContextConfiguration monitorContextConfiguration;
     private Map<String, ?> configYml = Maps.newHashMap();
 
@@ -49,10 +50,19 @@ public class NginxMonitor extends ABaseMonitor {
         try {
             List<Map<String, ?>> nginxServers = (List<Map<String, ?>>) configYml.get("servers");
             AssertUtils.assertNotNull(monitorContextConfiguration.getMetricsXml(), "Metrics xml not available");
+
+            Map<String, ?> kubernetesConfig = (Map<String, ?>) configYml.get("kubernetes");
+
+            Boolean kubernetesMode = Boolean.valueOf(kubernetesConfig.get("useKubernetes").toString());
+
             for (Map<String, ?> server : nginxServers) {
                 AssertUtils.assertNotNull(server, "the server arguments are empty");
-                AssertUtils.assertNotNull(server.get("displayName"), "The displayName can not be null");
-                logger.info("Starting the Nginx Monitoring Task for server : " + server.get("displayName"));
+                if (nginxServers.size() > 1 && !kubernetesMode) {
+                    AssertUtils.assertNotNull(server.get("displayName"), "The displayName can not be null");
+                    logger.info("Starting the Nginx Monitoring Task for server : " + server.get("displayName"));
+                } else {
+                    logger.info("Starting the Nginx Monitoring Task");
+                }
                 NginxMonitorTask task = new NginxMonitorTask(monitorContextConfiguration, tasksExecutionServiceProvider.getMetricWriteHelper(), server);
                 tasksExecutionServiceProvider.submit((String) server.get("displayName"), task);
             }
@@ -62,10 +72,10 @@ public class NginxMonitor extends ABaseMonitor {
     }
 
     @Override
-    protected int getTaskCount() {
+    protected List<Map<String, ?>> getServers() {
         List<Map<String, ?>> servers = (List<Map<String, ?>>) configYml.get("servers");
         AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
-        return servers.size();
+        return servers;
     }
 
     @Override
@@ -74,16 +84,18 @@ public class NginxMonitor extends ABaseMonitor {
         configYml = monitorContextConfiguration.getConfigYml();
         AssertUtils.assertNotNull(configYml, "The config.yml is not available");
         logger.info("initializing metric.xml file");
-        monitorContextConfiguration.setMetricXml(args.get("metric-file"), Stat.Stats.class);
+        monitorContextConfiguration.loadMetricXml(args.get("metric-file"), Stat.Stats.class);
     }
 
     public static void main(String[] args) throws TaskExecutionException {
+
 
         ConsoleAppender ca = new ConsoleAppender();
         ca.setWriter(new OutputStreamWriter(System.out));
         ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
         ca.setThreshold(Level.DEBUG);
-        logger.getRootLogger().addAppender(ca);
+        org.apache.log4j.Logger.getRootLogger().addAppender(ca);
+
         NginxMonitor monitor = new NginxMonitor();
 
         final Map<String, String> taskArgs = new HashMap<>();

@@ -6,6 +6,16 @@ metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Nginx|"
 #To find the <COMPONENT_ID> in your environment,
 #please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
 
+kubernetes:
+  useKubernetes: "false"
+  namespace: "default"
+  containerImageNameToMatch: "nginx"
+  containerPortName:
+  podLabels:
+    - name: "run"
+      value: "my-nginx"
+
+
 servers:
   - displayName: "Nginx Server" # mandatory
 #    uri: "http://localhost/nginx_status" # append port if needed

@@ -39,7 +39,7 @@ public class UpstreamsStatsExtractorTest {
     private String testString;
     private UpstreamsStatsExtractor upstreamsStatsExtractor = new UpstreamsStatsExtractor();
     private String metricPrefix;
-    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class), Mockito.mock(AMonitorJob.class));
+    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class));
     private Stat[] stats;
 
     @Before
@@ -51,7 +51,7 @@ public class UpstreamsStatsExtractorTest {
             inputStream.close();
         }
         metricPrefix = "Custom Metrics|NGinX|";
-        contextConfiguration.setMetricXml("src/test/resources/metricJson.xml", Stat.Stats.class);
+        contextConfiguration.loadMetricXml("src/test/resources/metricJson.xml", Stat.Stats.class);
         stats = ((Stat.Stats) contextConfiguration.getMetricsXml()).getStats();
 
     }

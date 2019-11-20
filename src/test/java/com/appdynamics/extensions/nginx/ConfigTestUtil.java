@@ -8,7 +8,6 @@
 
 package com.appdynamics.extensions.nginx;
 
-import com.appdynamics.extensions.AMonitorJob;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.nginx.Config.Stat;
 import org.mockito.Mockito;
@@ -18,11 +17,11 @@ import java.io.File;
 public class ConfigTestUtil {
 
     public static MonitorContextConfiguration getContextConfiguration(String xmlPath, String configPath) {
-        MonitorContextConfiguration configuration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class), Mockito.mock(AMonitorJob.class));
+        MonitorContextConfiguration configuration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class));
         if (configPath != null)
-            configuration.setConfigYml(configPath);
+            configuration.loadConfigYml(configPath);
         if (xmlPath != null)
-            configuration.setMetricXml(xmlPath, Stat.Stats.class);
+            configuration.loadMetricXml(xmlPath, Stat.Stats.class);
         return configuration;
     }
 

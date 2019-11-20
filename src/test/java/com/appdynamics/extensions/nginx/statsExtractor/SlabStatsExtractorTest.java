@@ -8,7 +8,6 @@
 
 package com.appdynamics.extensions.nginx.statsExtractor;
 
-import com.appdynamics.extensions.AMonitorJob;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.nginx.Config.Stat;
@@ -29,9 +28,9 @@ public class SlabStatsExtractorTest {
 
     private InputStream inputStream;
     private JSONObject responseBody;
-    private SlabStatsExtractor slabStatsExtractor  = new SlabStatsExtractor();
+    private SlabStatsExtractor slabStatsExtractor = new SlabStatsExtractor();
     private String metricPrefix;
-    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class), Mockito.mock(AMonitorJob.class));
+    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class));
     private Stat stat;
 
     @Before
@@ -45,21 +44,22 @@ public class SlabStatsExtractorTest {
         }
         responseBody = (JSONObject) new JSONArray(testString).get(2);
         metricPrefix = "Custom Metrics|NGinX|";
-        contextConfiguration.setMetricXml("src/test/resources/metricJson.xml", Stat.Stats.class);
+        contextConfiguration.loadMetricXml("src/test/resources/metricJson.xml", Stat.Stats.class);
         Stat[] stats = ((Stat.Stats) contextConfiguration.getMetricsXml()).getStats();
         stat = getAptStat(stats);
     }
+
     @Test
     public void extractSlabsStats() {
-        if(stat != null) {
+        if (stat != null) {
             List<Metric> slabMetricsList = slabStatsExtractor.extractStats(responseBody, stat, metricPrefix);
             Assert.assertTrue(slabMetricsList.size() == 2);
         }
     }
 
-    private Stat getAptStat(Stat[] stats){
-        for(Stat statItr : stats){
-            if(statItr.getName().equals("Slab-Status")){
+    private Stat getAptStat(Stat[] stats) {
+        for (Stat statItr : stats) {
+            if (statItr.getName().equals("Slab-Status")) {
                 return statItr;
             }
         }

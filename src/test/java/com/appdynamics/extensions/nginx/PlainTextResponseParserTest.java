@@ -40,7 +40,7 @@ public class PlainTextResponseParserTest {
     private FileInputStream inputStream;
     private String metricPrefix;
     private MetricConfig[] metricConfigs;
-    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class), Mockito.mock(AMonitorJob.class));
+    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class));
 
     @Before
     public void initialize() throws IOException {
@@ -51,7 +51,7 @@ public class PlainTextResponseParserTest {
         } finally {
             inputStream.close();
         }
-        contextConfiguration.setMetricXml("src/test/resources/metricsPlainText.xml", Stat.Stats.class);
+        contextConfiguration.loadMetricXml("src/test/resources/metricsPlainText.xml", Stat.Stats.class);
         Stat[] stats = ((Stat.Stats) contextConfiguration.getMetricsXml()).getStats();
         metricConfigs = stats[0].getMetricConfig();
         metricPrefix = "Custom Metrics|NGinX";

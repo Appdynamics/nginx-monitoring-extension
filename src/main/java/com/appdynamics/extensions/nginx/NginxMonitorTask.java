@@ -11,7 +11,7 @@ package com.appdynamics.extensions.nginx;
 import com.appdynamics.extensions.AMonitorTaskRunnable;
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
-import com.appdynamics.extensions.crypto.CryptoUtil;
+import com.appdynamics.extensions.util.CryptoUtils;
 import com.appdynamics.extensions.http.UrlBuilder;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.nginx.Config.MetricConfig;
@@ -44,24 +44,33 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
     private Map server;
     private MonitorContextConfiguration configuration;
     private MetricWriteHelper metricWriteHelper;
-    private String metricPrefix = "Custom Metrics|Nginx|";
+    private String metricPrefix;
     private BigInteger heartBeatValue = BigInteger.ZERO;
+    private String displayName = "DEFAULT";
 
     public NginxMonitorTask(MonitorContextConfiguration monitorContextConfiguration, MetricWriteHelper metricWriteHelper, Map server) {
         this.configuration = monitorContextConfiguration;
         this.server = server;
         this.metricWriteHelper = metricWriteHelper;
-        this.metricPrefix = configuration.getMetricPrefix() + METRIC_SEPARATOR + this.server.get("displayName");
+        this.metricPrefix = configuration.getMetricPrefix();
+
+        String name = (String) this.server.get("displayName");
+
+        if (!Strings.isNullOrEmpty(name)) {
+            displayName = name;
+            this.metricPrefix += METRIC_SEPARATOR + name;
+        }
     }
 
     public void run() {
         List<Metric> metricList = Lists.newArrayList();
         try {
+            logger.info("Started metric collection for server: " + displayName);
             Map<String, String> requestMap = buildRequestMap();
             populateMetrics(requestMap, metricList);
-            logger.info("Completed the Nginx Monitoring task");
+            logger.info("Completed metric collection for server: " + displayName);
         } catch (Exception e) {
-            logger.error("Error while running the task " + server.get("displayName") + e);
+            logger.error("Error while running the task for server: " + displayName, e);
         } finally {
             String prefix = metricPrefix + METRIC_SEPARATOR + "HeartBeat";
             Metric heartBeat = new Metric("HeartBeat", String.valueOf(heartBeatValue), prefix);
@@ -70,7 +79,7 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
         }
     }
 
-    private void populateMetrics(Map<String, String> requestMap, List<Metric> metricList) throws IOException, TaskExecutionException {
+    private void populateMetrics(Map<String, String> requestMap, List<Metric> metricList) {
         try {
             String url = UrlBuilder.builder(requestMap).build();
             if (server.get("nginx_plus").equals("false")) {
@@ -168,14 +177,14 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
             cryptoMap.put("encryptedPassword", encryptedPassword);
             cryptoMap.put("encryptionKey", encryptionKey);
             logger.debug("Decrypting the encrypted password........");
-            return CryptoUtil.getPassword(cryptoMap);
+            return CryptoUtils.getPassword(cryptoMap);
         }
         return "";
     }
 
     @Override
     public void onTaskComplete() {
-        logger.info("Completed the Nginx Monitoring task for log : " + server.get("displayName"));
+        logger.info("Completed the Nginx Monitoring task : " + displayName);
     }
 }
 

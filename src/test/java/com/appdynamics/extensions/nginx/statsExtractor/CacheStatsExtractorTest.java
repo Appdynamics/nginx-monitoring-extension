@@ -30,7 +30,7 @@ public class CacheStatsExtractorTest {
     private JSONObject responseBody;
     private CacheStatsExtractor cacheStatsExtractor = new CacheStatsExtractor();
     private String metricPrefix;
-    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class), Mockito.mock(AMonitorJob.class));
+    private MonitorContextConfiguration contextConfiguration = new MonitorContextConfiguration("NginxMonitor", "Custom Metrics|Nginx|", Mockito.mock(File.class));
     private Stat stat;
 
     @Before
@@ -44,7 +44,7 @@ public class CacheStatsExtractorTest {
         }
         responseBody = (JSONObject) new JSONArray(testString).get(1);
         metricPrefix = "Custom Metrics|NGinX|";
-        contextConfiguration.setMetricXml("src/test/resources/metricJson.xml", Stat.Stats.class);
+        contextConfiguration.loadMetricXml("src/test/resources/metricJson.xml", Stat.Stats.class);
         Stat[] stats = ((Stat.Stats) contextConfiguration.getMetricsXml()).getStats();
         stat = getAptStat(stats);
     }
