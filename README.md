@@ -61,28 +61,46 @@ Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/
 
   2. The extension supports reporting metrics from multiple Nginx instances. The monitor provides an option to add Nginx server/s for monitoring the metrics provided by the particular end-point. Have a look at config.yml for more details.
       For example:
-      ```
-        metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Nginx|"
+```
+# Use this only if SIM is enabled
+metricPrefix:  "Custom Metrics|Nginx|"
 
-		servers:
-		  - displayName: "Nginx Server" # mandatory
-		    uri: "http://localhost/nginx_status" # append port if needed
-		    username: ""
-		    password: ""
-		    encryptedPassword:
-		    nginx_plus: "false"  # true for nginx plus else false
+# If SIM is not enabled, then use this
+#metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Nginx|"
+#To find the <COMPONENT_ID> in your environment,
+#please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
 
-		encryptionKey: ""
+kubernetes:
+   useKubernetes: "true"
+   namespace: "default"
+   containerImageNameToMatch: "nginx"
+   #If there is only 1 container port then extension uses that and no need to provide the containerPortName here.
+   #If there are multiple container ports then provide the containerPortName to filter out the port.
+   containerPortName:
+   podLabels:
+     - name: "run"
+       value: "my-nginx"
 
-		connection:
-		  sslCertCheckEnabled: false
-		  socketTimeout: 10000
-		  connectTimeout: 10000
+servers:
+  #Mandatory if there are more than one server. Can be left blank for a single server.
+  - displayName:
+    uri: "http://${host}:${port}/nginx_status" # append port if needed
+    username: ""
+    password: ""
+    encryptedPassword:
+    nginx_plus: "false"  # true for nginx-plus else false
 
-		 # For each server you monitor, you will need a total of 8(by default) thread.
-		 # By default we want to support 5 servers, so it is 5 * 8 = 40 threads.
-		numberOfThreads: 12
-      ```
+encryptionKey: ""
+
+connection:
+  sslCertCheckEnabled: false
+  socketTimeout: 10000
+  connectTimeout: 10000
+
+  # For each server you monitor, you will need a total of 12(by default) threads.
+  # By default we want to support 3 servers, so it is 3 * 12 = 36 threads.
+numberOfThreads: 36
+```
   3. If you want to monitor [nginx plus](https://www.nginx.com/products/nginx/) then put nginx_plus as true and make sure [ngx_http_api_module](http://nginx.org/en/docs/http/ngx_http_api_module.html) is configured.
         ```
              nginx_plus: "true"  # true for nginx plus else false
