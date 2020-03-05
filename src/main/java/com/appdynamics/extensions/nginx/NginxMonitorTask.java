@@ -29,10 +29,11 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by adityajagtiani on 8/31/16.
@@ -45,7 +46,7 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
     private MonitorContextConfiguration configuration;
     private MetricWriteHelper metricWriteHelper;
     private String metricPrefix = "Custom Metrics|Nginx|";
-    private BigInteger heartBeatValue = BigInteger.ZERO;
+    private AtomicInteger heartBeat = new AtomicInteger(0);
 
     public NginxMonitorTask(MonitorContextConfiguration monitorContextConfiguration, MetricWriteHelper metricWriteHelper, Map server) {
         this.configuration = monitorContextConfiguration;
@@ -64,8 +65,8 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
             logger.error("Error while running the task " + server.get("displayName") + e);
         } finally {
             String prefix = metricPrefix + METRIC_SEPARATOR + "HeartBeat";
-            Metric heartBeat = new Metric("HeartBeat", String.valueOf(heartBeatValue), prefix);
-            metricList.add(heartBeat);
+            Metric heartBeatMetric = new Metric("HeartBeat", String.valueOf(heartBeat.get()), prefix);
+            metricList.add(heartBeatMetric);
             metricWriteHelper.transformAndPrintMetrics(metricList);
         }
     }
@@ -80,24 +81,28 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
                 logger.debug("nginx_plus is true");
                 Stat[] stats = ((Stat.Stats) configuration.getMetricsXml()).getStats();
                 url = url + ((Stat.Stats) configuration.getMetricsXml()).getUrl() + "/";
+                Phaser phaser = new Phaser();
+                phaser.register();
                 for (Stat stat : stats) {
                     if (stat.getStats() == null) {
                         if (!Strings.isNullOrEmpty(stat.getSubUrl())) {
-                            JSONResponseCollector jsonResponseCollector = new JSONResponseCollector(stat, configuration, metricWriteHelper, metricPrefix, url + stat.getSubUrl());
+                            phaser.register();
+                            JSONResponseCollector jsonResponseCollector = new JSONResponseCollector(stat, configuration, metricWriteHelper, metricPrefix, url + stat.getSubUrl(), heartBeat, phaser);
                             configuration.getContext().getExecutorService().execute("MetricCollector", jsonResponseCollector);
                             logger.debug("Registering MetricCollectorTask for " + server.get("displayName") + "for stats " + stat.getSubUrl());
                         }
                     } else {
                         Stat[] substats = stat.getStats();
                         for (Stat subStat : substats) {
-                            JSONResponseCollector jsonResponseCollector = new JSONResponseCollector(subStat, configuration, metricWriteHelper, metricPrefix + METRIC_SEPARATOR + stat.getSubUrl(), url + stat.getSubUrl() + "/" + subStat.getSubUrl());
+                            phaser.register();
+                            JSONResponseCollector jsonResponseCollector = new JSONResponseCollector(subStat, configuration, metricWriteHelper, metricPrefix + METRIC_SEPARATOR + stat.getSubUrl(), url + stat.getSubUrl() + "/" + subStat.getSubUrl(), heartBeat, phaser);
                             configuration.getContext().getExecutorService().execute("MetricCollector", jsonResponseCollector);
                             logger.debug("Starting MetricCollectorTask for " + server.get("displayName") + "for stats " + subStat.getSubUrl());
                         }
                     }
                 }
+                phaser.arriveAndAwaitAdvance();
             }
-            heartBeatValue = BigInteger.ONE;
         } catch (Exception e) {
             logger.error("Failed to complete nginx Monitor task{}", e);
         }
@@ -112,6 +117,8 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
             response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity, "UTF-8");
+
+            heartBeat.incrementAndGet();
             AssertUtils.assertNotNull(responseBody, "response of the request is empty");
             logger.debug("response collected for text/plain: " + responseBody);
             String header = response.getFirstHeader("Content-Type").getValue();

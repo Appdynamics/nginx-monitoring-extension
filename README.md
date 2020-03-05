@@ -67,6 +67,7 @@ Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/
 		servers:
 		  - displayName: "Nginx Server" # mandatory
 		    uri: "http://localhost/nginx_status" # append port if needed
+      # uri: "http://demo.nginx.com/" # when nginx_plus equals true
 		    username: ""
 		    password: ""
 		    encryptedPassword:
@@ -86,6 +87,10 @@ Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/
   3. If you want to monitor [nginx plus](https://www.nginx.com/products/nginx/) then put nginx_plus as true and make sure [ngx_http_api_module](http://nginx.org/en/docs/http/ngx_http_api_module.html) is configured.
         ```
              nginx_plus: "true"  # true for nginx plus else false
+        ```
+       **NOTE:** When you want to monitor Nginx Plus, then the uri should not have the nginx_status. uri should be the Hostname/IP as below.
+        ```
+             uri: "http://demo.nginx.com/"
         ```
   4. Configure the numberOfThreads.
      For example,

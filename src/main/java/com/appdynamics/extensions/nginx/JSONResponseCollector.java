@@ -12,10 +12,10 @@ import com.appdynamics.extensions.conf.MonitorContextConfiguration;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.nginx.Config.MetricConfig;
 import com.appdynamics.extensions.nginx.Config.Stat;
-import com.appdynamics.extensions.util.AssertUtils;
 import static com.appdynamics.extensions.nginx.Constant.METRIC_SEPARATOR;
 import com.appdynamics.extensions.nginx.statsExtractor.StatsExtractor;
 import com.appdynamics.extensions.nginx.statsExtractor.StatsFactory;
+import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Lists;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -31,6 +31,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class JSONResponseCollector implements Runnable {
 
@@ -48,13 +50,19 @@ public class JSONResponseCollector implements Runnable {
 
     private String metricPrefix;
 
+    private AtomicInteger heartBeat;
 
-    public JSONResponseCollector(Stat stat, MonitorContextConfiguration configuration, MetricWriteHelper metricWriteHelper, String metricPrefix, String url) {
+    private Phaser phaser;
+
+
+    public JSONResponseCollector(Stat stat, MonitorContextConfiguration configuration, MetricWriteHelper metricWriteHelper, String metricPrefix, String url, AtomicInteger heartBeat, Phaser phaser) {
         this.stat = stat;
         this.configuration = configuration;
         this.metricWriteHelper = metricWriteHelper;
         this.url = url;
         this.metricPrefix = metricPrefix + METRIC_SEPARATOR + stat.getSubUrl() + METRIC_SEPARATOR;
+        this.heartBeat = heartBeat;
+        this.phaser = phaser;
     }
 
 
@@ -67,7 +75,8 @@ public class JSONResponseCollector implements Runnable {
             response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             String responseBody = EntityUtils.toString(entity, "UTF-8");
-
+            if (heartBeat.get() == 0)
+                heartBeat.incrementAndGet();
             AssertUtils.assertNotNull(responseBody, "response of the request is empty");
             String header = response.getFirstHeader("Content-Type").getValue();
             if (header != null && header.contains("application/json")) {
@@ -92,6 +101,7 @@ public class JSONResponseCollector implements Runnable {
                 }
             }
             metricWriteHelper.transformAndPrintMetrics(metricList);
+            phaser.arriveAndDeregister();
         }
     }
 
