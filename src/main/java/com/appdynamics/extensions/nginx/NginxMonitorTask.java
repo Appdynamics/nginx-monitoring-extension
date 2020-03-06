@@ -86,7 +86,6 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
                 for (Stat stat : stats) {
                     if (stat.getStats() == null) {
                         if (!Strings.isNullOrEmpty(stat.getSubUrl())) {
-                            phaser.register();
                             JSONResponseCollector jsonResponseCollector = new JSONResponseCollector(stat, configuration, metricWriteHelper, metricPrefix, url + stat.getSubUrl(), heartBeat, phaser);
                             configuration.getContext().getExecutorService().execute("MetricCollector", jsonResponseCollector);
                             logger.debug("Registering MetricCollectorTask for " + server.get("displayName") + "for stats " + stat.getSubUrl());
@@ -94,7 +93,6 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
                     } else {
                         Stat[] substats = stat.getStats();
                         for (Stat subStat : substats) {
-                            phaser.register();
                             JSONResponseCollector jsonResponseCollector = new JSONResponseCollector(subStat, configuration, metricWriteHelper, metricPrefix + METRIC_SEPARATOR + stat.getSubUrl(), url + stat.getSubUrl() + "/" + subStat.getSubUrl(), heartBeat, phaser);
                             configuration.getContext().getExecutorService().execute("MetricCollector", jsonResponseCollector);
                             logger.debug("Starting MetricCollectorTask for " + server.get("displayName") + "for stats " + subStat.getSubUrl());

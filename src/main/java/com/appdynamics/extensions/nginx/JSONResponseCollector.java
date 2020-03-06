@@ -63,6 +63,7 @@ public class JSONResponseCollector implements Runnable {
         this.metricPrefix = metricPrefix + METRIC_SEPARATOR + stat.getSubUrl() + METRIC_SEPARATOR;
         this.heartBeat = heartBeat;
         this.phaser = phaser;
+        this.phaser.register();
     }
 
 
