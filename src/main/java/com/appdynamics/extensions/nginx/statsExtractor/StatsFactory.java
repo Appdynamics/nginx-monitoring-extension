@@ -23,7 +23,6 @@ public class StatsFactory {
         } else if (statsUrl.equals("slabs")) {
             return new SlabStatsExtractor();
         } else {
-            logger.warn("No matching class in the factory for: " + statsUrl);
             return null;
         }
     }

@@ -39,6 +39,8 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by adityajagtiani on 10/10/16.
@@ -65,6 +67,8 @@ public class JSONResponseCollectorTest {
     private Header header;
     @Mock
     private MetricWriteHelper metricWriter;
+    @Mock
+    private Phaser phaser;
     private ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
     Map<String, String> expectedValueMap;
 
@@ -101,7 +105,7 @@ public class JSONResponseCollectorTest {
         Stat stat = ConfigTestUtil.getAptStat(stats, "Processes-Status", null);
         when(EntityUtils.toString(entity, "UTF-8")).thenReturn(responseBody);
         if(stat != null) {
-            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix, "url" );
+            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix, "url", new AtomicInteger(0), phaser);
             parser.run();
             expectedValueMap = getExpectedProcessStatusMap();
             assertActualAndExpectedMetrics();
@@ -116,7 +120,7 @@ public class JSONResponseCollectorTest {
         Stat stat = ConfigTestUtil.getAptStat(stats, "Connections-Statistics", null);
         when(EntityUtils.toString(entity, "UTF-8")).thenReturn(responseBody);
         if(stat != null) {
-            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix, "url" );
+            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix, "url", new AtomicInteger(0), phaser);
             parser.run();
             expectedValueMap = getExpectedConnectionsStatusMap();
             assertActualAndExpectedMetrics();
@@ -130,7 +134,7 @@ public class JSONResponseCollectorTest {
         Stat stat = ConfigTestUtil.getAptStat(stats, "SSL-Statistics", null);
         when(EntityUtils.toString(entity, "UTF-8")).thenReturn(responseBody);
         if(stat != null) {
-            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix, "url" );
+            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix, "url", new AtomicInteger(0), phaser);
             parser.run();
             expectedValueMap = getExpectedSslStatusMap();
             assertActualAndExpectedMetrics();
@@ -143,7 +147,7 @@ public class JSONResponseCollectorTest {
         Stat stat = ConfigTestUtil.getAptStat(stats, "HTTP-Endpoints", "Requests");
         when(EntityUtils.toString(entity, "UTF-8")).thenReturn(responseBody);
         if(stat != null) {
-            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix + "|http" , "url" );
+            parser = new JSONResponseCollector(stat, contextConfiguration, metricWriter, metricPrefix + "|http" , "url", new AtomicInteger(0), phaser);
             parser.run();
             expectedValueMap = getExpectedRequestStatusMap();
             assertActualAndExpectedMetrics();
