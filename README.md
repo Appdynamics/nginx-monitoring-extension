@@ -244,8 +244,8 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 ## Version
 |          Name            |  Version          |
 |--------------------------|-------------------|
-|Extension Version         |2.0.0              |
+|Extension Version         |2.2.0              |
 |Controller Compatibility  |3.7 or Later       |
 |Product Tested On         |1.13.3 and later   |
-|Last Update               |12/02/2019         |
+|Last Update               |29/04/2020         |
 |Changes list              |[ChangeLog](https://github.com/Appdynamics/nginx-monitoring-extension/blob/master/CHANGELOG.md)|

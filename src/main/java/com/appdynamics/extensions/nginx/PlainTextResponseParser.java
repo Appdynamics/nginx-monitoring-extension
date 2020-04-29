@@ -8,11 +8,12 @@
 
 package com.appdynamics.extensions.nginx;
 
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.nginx.Config.MetricConfig;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import org.apache.log4j.Logger;
-import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,7 +27,7 @@ import java.util.regex.Pattern;
  * Created by adityajagtiani on 10/10/16.
  */
 public class PlainTextResponseParser {
-    public static final Logger logger = Logger.getLogger(PlainTextResponseParser.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(PlainTextResponseParser.class);
 
     private static ObjectMapper objectMapper = new ObjectMapper();
 

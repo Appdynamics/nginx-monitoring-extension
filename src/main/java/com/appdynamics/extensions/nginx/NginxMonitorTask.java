@@ -11,8 +11,9 @@ package com.appdynamics.extensions.nginx;
 import com.appdynamics.extensions.AMonitorTaskRunnable;
 import com.appdynamics.extensions.MetricWriteHelper;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
-import com.appdynamics.extensions.crypto.CryptoUtil;
+import com.appdynamics.extensions.util.CryptoUtils;
 import com.appdynamics.extensions.http.UrlBuilder;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.nginx.Config.MetricConfig;
 import com.appdynamics.extensions.nginx.Config.Stat;
@@ -26,7 +27,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class NginxMonitorTask implements AMonitorTaskRunnable {
 
-    public static final Logger logger = Logger.getLogger(NginxMonitorTask.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(NginxMonitorTask.class);
     private static final String METRIC_SEPARATOR = Constant.METRIC_SEPARATOR;
     private Map server;
     private MonitorContextConfiguration configuration;
@@ -173,7 +174,7 @@ class NginxMonitorTask implements AMonitorTaskRunnable {
             cryptoMap.put("encryptedPassword", encryptedPassword);
             cryptoMap.put("encryptionKey", encryptionKey);
             logger.debug("Decrypting the encrypted password........");
-            return CryptoUtil.getPassword(cryptoMap);
+            return CryptoUtils.getPassword(cryptoMap);
         }
         return "";
     }

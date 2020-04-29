@@ -11,17 +11,12 @@ package com.appdynamics.extensions.nginx;
 import com.appdynamics.extensions.ABaseMonitor;
 import com.appdynamics.extensions.TasksExecutionServiceProvider;
 import com.appdynamics.extensions.conf.MonitorContextConfiguration;
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
 import com.appdynamics.extensions.nginx.Config.Stat;
 import com.appdynamics.extensions.util.AssertUtils;
 import com.google.common.collect.Maps;
-import com.singularity.ee.agent.systemagent.api.exception.TaskExecutionException;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
+import org.slf4j.Logger;
 
-import java.io.OutputStreamWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +25,7 @@ import java.util.Map;
  */
 
 public class NginxMonitor extends ABaseMonitor {
-    public static final Logger logger = Logger.getLogger(NginxMonitor.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(NginxMonitor.class);
     private MonitorContextConfiguration monitorContextConfiguration;
     private Map<String, ?> configYml = Maps.newHashMap();
 
@@ -62,10 +57,8 @@ public class NginxMonitor extends ABaseMonitor {
     }
 
     @Override
-    protected int getTaskCount() {
-        List<Map<String, ?>> servers = (List<Map<String, ?>>) configYml.get("servers");
-        AssertUtils.assertNotNull(servers, "The 'servers' section in config.yml is not initialised");
-        return servers.size();
+    protected List<Map<String, ?>> getServers() {
+        return (List<Map<String, ?>>) configYml.get("servers");
     }
 
     @Override
@@ -77,20 +70,14 @@ public class NginxMonitor extends ABaseMonitor {
         monitorContextConfiguration.setMetricXml(args.get("metric-file"), Stat.Stats.class);
     }
 
-    public static void main(String[] args) throws TaskExecutionException {
-
-        ConsoleAppender ca = new ConsoleAppender();
-        ca.setWriter(new OutputStreamWriter(System.out));
-        ca.setLayout(new PatternLayout("%-5p [%t]: %m%n"));
-        ca.setThreshold(Level.DEBUG);
-        logger.getRootLogger().addAppender(ca);
-        NginxMonitor monitor = new NginxMonitor();
-
-        final Map<String, String> taskArgs = new HashMap<>();
-        taskArgs.put("config-file", "src/main/resources/config.yml");
-        taskArgs.put("metric-file", "src/main/resources/metrics.xml");
-
-        monitor.execute(taskArgs, null);
-
-    }
+//    public static void main(String[] args) throws TaskExecutionException {
+//
+//        NginxMonitor monitor = new NginxMonitor();
+//        final Map<String, String> taskArgs = new HashMap<>();
+//        taskArgs.put("config-file", "src/main/resources/config.yml");
+//        taskArgs.put("metric-file", "src/main/resources/metrics.xml");
+//
+//        monitor.execute(taskArgs, null);
+//
+//    }
 }

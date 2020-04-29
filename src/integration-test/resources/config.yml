@@ -2,18 +2,18 @@
 #metricPrefix:  "Custom Metrics|Nginx|"
 
 # If SIM is not enabled, then use this
-metricPrefix:  "Server|Component:<TIER_ID>|Custom Metrics|Nginx|"
+metricPrefix:  "Custom Metrics|Nginx|"
 #To find the <COMPONENT_ID> in your environment,
 #please follow the screenshot https://docs.appdynamics.com/display/PRO42/Build+a+Monitoring+Extension+Using+Java
 
 servers:
   - displayName: "Nginx Server" # mandatory
-    uri: "http://localhost/nginx_status" # append port if needed
-#    uri: "http://demo.nginx.com/" # append port if needed
+#    uri: "http://localhost/nginx_status" # append port if needed
+    uri: "http://demo.nginx.com/" # append port if needed
     username: ""
     password: ""
     encryptedPassword:
-    nginx_plus: "false"  # true for nginx plus else false
+    nginx_plus: "true"  # true for nginx plus else false
 
 encryptionKey: ""
 
@@ -36,7 +36,7 @@ customDashboard:
   pathToNormalDashboard: "monitors/NginxMonitor/CustomDashboard_App.json"
 
 controllerInfo:
-  controllerHost: ""
+  controllerHost: "${APPDYNAMICS_CONTROLLER_HOST_NAME}"
   controllerPort: 8080
   account: "customer1"
   username: "user1"
@@ -46,7 +46,7 @@ controllerInfo:
   controllerSslEnabled: false
   enableOrchestration: false
   uniqueHostId: ""
-  accountAccessKey: "$"
+  accountAccessKey: "${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}"
   machinePath: ""
   simEnabled: true
   applicationName: ""

@@ -11,8 +11,8 @@ package com.appdynamics.extensions.nginx.statsExtractor;
 import com.appdynamics.extensions.metrics.Metric;
 import com.appdynamics.extensions.nginx.Config.MetricConfig;
 import com.appdynamics.extensions.nginx.Config.Stat;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
