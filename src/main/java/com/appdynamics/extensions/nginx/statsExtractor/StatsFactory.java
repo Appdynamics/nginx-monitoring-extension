@@ -8,10 +8,12 @@
 
 package com.appdynamics.extensions.nginx.statsExtractor;
 
-import org.apache.log4j.Logger;
+
+import com.appdynamics.extensions.logging.ExtensionsLoggerFactory;
+import org.slf4j.Logger;
 
 public class StatsFactory {
-    public static final Logger logger = Logger.getLogger(StatsFactory.class);
+    public static final Logger logger = ExtensionsLoggerFactory.getLogger(StatsFactory.class);
 
     public StatsExtractor getstatsExtractor(String statsUrl) {
         if (statsUrl.equals("server_zones")) {

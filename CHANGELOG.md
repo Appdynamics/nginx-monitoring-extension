@@ -8,3 +8,7 @@
 2. Tested for different Nginx v-1.15.x APIs
 3. Added extra configurability with metrics.xml
 4. Covered tests
+
+### 2.2.0 - April 29, 2020
+1. Revamped tp Commons 2.2.2
+2. Covered btd and Auto-dashboards
