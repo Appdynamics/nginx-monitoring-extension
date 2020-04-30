@@ -72,3 +72,11 @@ atlassian-ide-plugin.xml
 
 # NetBeans specific files/directories
 .nbattrs
+
+#Github specific file ignore
+.teamcity/*
+docker-compose.yml
+Dockerfile_MA
+Dockerfile_WorkBench
+Makefile
+src/integration-test/*
