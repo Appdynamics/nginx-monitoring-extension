@@ -74,7 +74,7 @@ atlassian-ide-plugin.xml
 .nbattrs
 
 #Github specific file ignore
-.teamcity/*
+#.teamcity/*
 docker-compose.yml
 Dockerfile_MA
 Dockerfile_WorkBench
