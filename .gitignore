@@ -73,12 +73,8 @@ atlassian-ide-plugin.xml
 # NetBeans specific files/directories
 .nbattrs
 
-#Github specific file ignore
-<<<<<<< HEAD
-#.teamcity/*
-=======
+#Github specific file ignore for reflog
 .teamcity/*
->>>>>>> 71bb54694f6aff4534e9c081bae091278dde9942
 docker-compose.yml
 Dockerfile_MA
 Dockerfile_WorkBench
