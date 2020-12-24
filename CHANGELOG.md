@@ -12,3 +12,6 @@
 ### 2.2.0 - April 29, 2020
 1. Revamped tp Commons 2.2.2
 2. Covered btd and Auto-dashboards
+
+### 2.2.1 - Dec 21, 2020
+1. Updated to appd-exts-commons 2.2.4
