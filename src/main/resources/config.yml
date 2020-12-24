@@ -29,7 +29,7 @@ numberOfThreads: 36
 
 # Generate a custom dashboard based on the provided template
 customDashboard:
-  enabled: true
+  enabled: false
   dashboardName: "Nginx Dashboard"
   # Update the path to the dashboard file.
   pathToSIMDashboard: "monitors/NginxMonitor/CustomDashboard_SIM.json"
@@ -41,8 +41,7 @@ controllerInfo:
   account: "customer1"
   username: "user1"
   password: "welcome"
-  encryptedPassword: ""
-  encryptionKey: ""
+#  encryptedPassword: ""
   controllerSslEnabled: false
   enableOrchestration: false
   uniqueHostId: ""
