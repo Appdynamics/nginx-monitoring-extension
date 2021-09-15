@@ -5,23 +5,21 @@ Nginx is a web server which can also be used as a reverse proxy, load balancer, 
 
 ## Prerequisites
 
-In order to use this extension, you do need a [Standalone JAVA Machine Agent](https://docs.appdynamics.com/display/PRO44/Standalone+Machine+Agents) or [SIM Agent](https://docs.appdynamics.com/display/PRO44/Server+Visibility).  For more details on downloading these products, please  visit [here](https://download.appdynamics.com/).
-The extension needs to be able to connect to the Nginx in order to collect and send metrics. To do this, you will have to either establish a remote connection in between the extension and the product, or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
+1. Before the extension is installed, the prerequisites mentioned [here](https://community.appdynamics.com/t5/Knowledge-Base/Extensions-Prerequisites-Guide/ta-p/35213) need to be met. Please do not proceed with the extension installation if the specified prerequisites are not met.
+2. The extension needs to be able to connect to the Nginx in order to collect and send metrics. To do this, you will have to either establish a remote connection in between the extension and the product, or have an agent on the same machine running the product in order for the extension to collect and send the metrics.
 
 
 ## Installation
 
 **Note**: For the following steps to work, nginx should be running with <a href="http://nginx.org/en/docs/http/ngx_http_stub_status_module.html">&quot;ngx_http_stub_status_module&quot;</a> or <a href="http://nginx.org/en/docs/http/ngx_http_api_module.html">&quot;ngx_http_api_module&quot;</a> enabled. Please make sure you have required changes in the nginx.conf.
 
-
-1. Download and unzip the nginx-monitoring-extension-2.0.0.zip to the "<MachineAgent_Dir>/monitors" directory.
-2. Edit the file config.yml as described below in Configuration Section, located in <MachineAgent_Dir>/monitors/NginxMonitor and update the server(s) details.
-3. All metrics to be reported are configured in metrics.xml. Users can remove entries from metrics.xml to stop the metric from reporting, or add new entries as well.
-4. Restart the Machine Agent.
+1. Run 'mvn clean install' from "nginx-monitoring-extension"
+2. Unzip the `nginx-monitoring-extension-<VERSION>.zip` from `target` directory into the "<MachineAgent_Dir>/monitors" directory.
+3. Edit the file config.yml as described below in Configuration Section, located in <MachineAgent_Dir>/monitors/NginxMonitor and update the server(s) details.
+4. All metrics to be reported are configured in metrics.xml. Users can remove entries from metrics.xml to stop the metric from reporting, or add new entries as well.
+5. Restart the Machine Agent.
 
 Please place the extension in the **"monitors"** directory of your **Machine Agent** installation directory. Do not place the extension in the **"extensions"** directory of your **Machine Agent** installation directory.
-In the AppDynamics Metric Browser, look for **Application Infrastructure Performance|\<Tier\>|Custom Metrics|NginX Monitor** and you should be able to see all the metrics.
-
 
 ## Directory Structure
 
@@ -32,7 +30,7 @@ In the AppDynamics Metric Browser, look for **Application Infrastructure Perform
 </tr>
 <tr>
 <td class='confluenceTd'> src/main/resources/conf </td>
-<td class='confluenceTd'> Contains the monitor.xml </td>
+<td class='confluenceTd'> Contains the config.yml and monitor.xml </td>
 </tr>
 <tr>
 <td class='confluenceTd'> src/main/java </td>
@@ -58,6 +56,7 @@ Configure the extension by editing the config.yml file in `<MACHINE_AGENT_HOME>/
        ```
         metricPrefix:  "Server|Component:100>|Custom Metrics|Nginx|"
        ```
+More details around metric prefix can be found [here](https://community.appdynamics.com/t5/Knowledge-Base/How-do-I-troubleshoot-missing-custom-metrics-or-extensions/ta-p/28695).
 
   2. The extension supports reporting metrics from multiple Nginx instances. The monitor provides an option to add Nginx server/s for monitoring the metrics provided by the particular end-point. Have a look at config.yml for more details.
       For example:
@@ -120,9 +119,9 @@ For configuring the metrics, the following properties can be used:
  |     Property      |   Default value |         Possible values         |                                               Description                                                      |
  | ----------------- | --------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------------- |
  | alias             | metric name     | Any string                      | The substitute name to be used in the metric browser instead of metric name.                                   |
- | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)    |
- | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)   |
- | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/PRO44/Build+a+Monitoring+Extension+Using+Java)|
+ | aggregationType   | "AVERAGE"       | "AVERAGE", "SUM", "OBSERVATION" | [Aggregation qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)    |
+ | timeRollUpType    | "AVERAGE"       | "AVERAGE", "SUM", "CURRENT"     | [Time roll-up qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)   |
+ | clusterRollUpType | "INDIVIDUAL"    | "INDIVIDUAL", "COLLECTIVE"      | [Cluster roll-up qualifier](https://docs.appdynamics.com/display/latest/Build+a+Monitoring+Extension+Using+Java)|
  | multiplier        | 1               | Any number                      | Value with which the metric needs to be multiplied.                                                            |
  | convert           | null            | Any key value map               | Set of key value pairs that indicates the value to which the metrics need to be transformed. eg: UP:1, OPEN:1  |
  | delta             | false           | true, false                     | If enabled, gives the delta values of metrics instead of actual values.                                        |
@@ -228,8 +227,8 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 |          Name            |  Version          |
 |--------------------------|-------------------|
 |Extension Version         |2.2.1              |
-|Controller Compatibility  |4.5+       |
-|Agent Compatibility  |4.5.13+       |
 |Product Tested On         |1.13.3 and later   |
 |Last Update               |21/12/2020         |
 |Changes list              |[ChangeLog](https://github.com/Appdynamics/nginx-monitoring-extension/blob/master/CHANGELOG.md)|
+
+**Note**: While extensions are maintained and supported by customers under the open-source licensing model, they interact with agents and Controllers that are subject to [AppDynamics’ maintenance and support policy](https://docs.appdynamics.com/latest/en/product-and-release-announcements/maintenance-support-for-software-versions). Some extensions have been tested with AppDynamics 4.5.13+ artifacts, but you are strongly recommended against using versions that are no longer supported.
