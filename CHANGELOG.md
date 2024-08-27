@@ -15,3 +15,7 @@
 
 ### 2.2.1 - Dec 21, 2020
 1. Updated to appd-exts-commons 2.2.4
+
+### 2.2.2 - Aug 27, 2024
+1. Updated to appd-exts-commons 2.2.13
+2. Fixed security vulnerabilities.
