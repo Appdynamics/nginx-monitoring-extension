@@ -226,9 +226,9 @@ Always feel free to fork and contribute any changes directly here on [GitHub](ht
 ## Version
 |          Name            |  Version          |
 |--------------------------|-------------------|
-|Extension Version         |2.2.1              |
+|Extension Version         |2.2.2              |
 |Product Tested On         |1.13.3 and later   |
-|Last Update               |21/12/2020         |
+|Last Update               |08/27/2024         |
 |Changes list              |[ChangeLog](https://github.com/Appdynamics/nginx-monitoring-extension/blob/master/CHANGELOG.md)|
 
 **Note**: While extensions are maintained and supported by customers under the open-source licensing model, they interact with agents and Controllers that are subject to [AppDynamics’ maintenance and support policy](https://docs.appdynamics.com/latest/en/product-and-release-announcements/maintenance-support-for-software-versions). Some extensions have been tested with AppDynamics 4.5.13+ artifacts, but you are strongly recommended against using versions that are no longer supported.
