@@ -67,6 +67,8 @@ class NginxMonitorTaskTest {
     Map config;
     private ArgumentCaptor<List> pathCaptor = ArgumentCaptor.forClass(List.class);
 
+    public NginxMonitorTaskTest() {};
+
     @Before
     public void setup() throws IOException {
         MonitorContextConfiguration contextConfiguration = ConfigTestUtil.getContextConfiguration("src/test/resources/metricsPlainText.xml", "src/test/resources/config.yml");
